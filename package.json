@@ -1,0 +1,48 @@
+{
+  "name": "firepanda",
+  "version": "0.0.1",
+  "description": "A Firestore ORM built using Typescript",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "ava",
+    "test:coverage": "nyc ava"
+  },
+  "author": "Georges Jentgen <georges@polysign.lu>",
+  "license": "ISC",
+  "devDependencies": {
+    "ava": "^1.4.1",
+    "firebase": "^5.10.0",
+    "nyc": "^14.0.0",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
+  },
+  "ava": {
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "**/*.d.ts",
+      "test/**/*",
+      "coverage/**/*",
+      ".secrets/**/*"
+    ],
+    "reporter": [
+      "text",
+      "text-summary",
+      "html"
+    ],
+    "all": true 
+  }
+}

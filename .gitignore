@@ -1,0 +1,5 @@
+/node_modules
+/lib
+/.secret
+.nyc_output
+coverage
