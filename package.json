@@ -25,6 +25,9 @@
     ],
     "require": [
       "ts-node/register"
+    ],
+    "files": [
+      "test/**/*.test.ts"
     ]
   },
   "nyc": {

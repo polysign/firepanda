@@ -3,9 +3,22 @@ import { app } from 'firebase'
 
 import { IRepository } from "./types";
 
+interface CollectionSchemaItem {
+  type: string;
+  default?: any;
+  required?: boolean;
+  transform?: Function;
+}
+
+interface CollectionFunctionItem {
+  on: 'create' | 'write' | 'delete';
+  functionName: string;
+}
+
 interface CollectionParams {
   name: string;
-  schema: any;
+  schema: { [name: string]: CollectionSchemaItem };
+  functions?: { [name: string]: CollectionFunctionItem };
 }
 
 export class Repository implements IRepository {
@@ -18,14 +31,12 @@ export class Repository implements IRepository {
     debugger;
   }
 
-  private getDocRef() {
+  protected __getDocId() {
+    return this.data.id;
+  }
+
+  private __getDocRef() {
     debugger;
-    console.log(this);
-    console.log(this);
-    console.log(this);
-    console.log(this);
-    console.log(this);
-    console.log(this);
     console.log(this);
     // this.docRef = this.firebase.firestore().doc(this.documentId);
   }
@@ -33,7 +44,7 @@ export class Repository implements IRepository {
   public async get(documentId?: string): Promise<any> {
     if (documentId) {
       this.documentId = documentId;
-      this.getDocRef();
+      this.__getDocRef();
     }
 
     return await this.docRef.get().then((documentSnapshot: firebase.firestore.DocumentSnapshot) => {
@@ -79,18 +90,18 @@ export function Collection(params: CollectionParams) {
 
         if (args[1]) {
           this.documentPath = [this.collectionName, args[1]].join('/');
-          debugger;
-          this.getDocRef();
+          console.log(this.documentPath);
+          this.__getDocRef();
         } else {
-          this.injectDefaults();
+          this.__injectDefaults();
         }
       }
 
-      getDocRef() {
+      __getDocRef() {
         this.docRef = this.firebase.firestore().doc(this.documentPath);
       }
 
-      injectDefaults() {
+      __injectDefaults() {
         Object.keys(this.collectionSchema).forEach((key) => {
           switch(this.collectionSchema[key].type) {
             case 'string':
@@ -109,7 +120,7 @@ export function Collection(params: CollectionParams) {
         });
       }
 
-      beforeSaveHook() {
+      __beforeSaveHook() {
         console.log('beforeSaveHook');
         Object.keys(this.collectionSchema).forEach((key) => {
           if (this.collectionSchema[key].transform) {
@@ -118,7 +129,7 @@ export function Collection(params: CollectionParams) {
         })
       }
       
-      afterSaveHook() {
+      __afterSaveHook() {
         console.log('afterSaveHook');
       }
       
