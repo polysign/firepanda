@@ -3,22 +3,35 @@ import { app } from 'firebase'
 
 import { IRepository } from "./types";
 
-interface CollectionSchemaItem {
+interface CollectionSchemaDefinition {
   type: string;
+  name?: string;
   default?: any;
   required?: boolean;
-  transform?: Function;
+  className?: string;
+  transform?: TransformationFunctioin;
 }
 
-interface CollectionFunctionItem {
+interface CollectionRuleDefinition {
+  isAuthenticated: Boolean;
+  equal?: string[];
+}
+
+interface CollectionHook {
   on: 'create' | 'write' | 'delete';
-  functionName: string;
+  functionName?: string;
 }
 
 interface CollectionParams {
   name: string;
-  schema: { [name: string]: CollectionSchemaItem };
-  functions?: { [name: string]: CollectionFunctionItem };
+  schema: { [name: string]: CollectionSchemaDefinition };
+  rules: { [name: string]: CollectionRuleDefinition }
+  hooks?: { [name: string]: CollectionHook };
+}
+
+interface TransformationFunctioin {
+  handler: Function;
+  on?: 'create' | 'write' | 'delete';
 }
 
 export class Repository implements IRepository {
