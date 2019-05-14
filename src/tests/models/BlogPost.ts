@@ -1,4 +1,4 @@
-import { Collection, Repository } from '../../src/Firepanda';
+import { Collection, Repository } from '../../index';
 import { BlogPostComment } from './BlogPostComment';
 
 @Collection({

@@ -1,4 +1,4 @@
-import { Collection, Repository } from '../../src/Firepanda';
+import { Collection, Repository } from '../../index';
 
 @Collection({
   name: 'users',
@@ -15,7 +15,8 @@ import { Collection, Repository } from '../../src/Firepanda';
     list: null,
     read: { isAuthenticated: true, equal: ['resource.data.userId', 'request.auth.uid'] },
     update: { isAuthenticated: true, equal: ['resource.data.userId', 'request.auth.uid'] },
-    write: { isAuthenticated: true }
+    write: { isAuthenticated: true },
+    delete: null
   },
   hooks: {
     removeAllUserData: { on: 'delete' },

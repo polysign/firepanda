@@ -4,11 +4,15 @@
   "description": "A Firestore ORM built using Typescript",
   "main": "lib/index.js",
   "scripts": {
-    "build": "tsc",
+    "cli:firepanda": "node bin/firepanda",
+    "cli": "npm-run-all -l cli:*",
     "test": "jest"
   },
   "author": "Georges Jentgen <georges@polysign.lu>",
   "license": "ISC",
+  "bin": {
+    "firepanda": "bin/firepanda"
+  },
   "devDependencies": {
     "@types/jest": "^24.0.12",
     "firebase": "^6.0.2",
@@ -19,7 +23,10 @@
     "typescript": "^3.4.5"
   },
   "dependencies": {
+    "delay": "^4.2.0",
     "firebase-admin": "^7.3.0",
-    "firebase-functions": "^2.3.1"
+    "firebase-functions": "^2.3.1",
+    "npm-run-all": "^4.1.5",
+    "ora": "^3.4.0"
   }
 }

@@ -1,4 +1,5 @@
-import { Collection, Repository } from './Firepanda';
+import { Collection } from './Collection';
+import { Repository } from './Repository';
 
 export * from './types';
 export { Collection, Repository };

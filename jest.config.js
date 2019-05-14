@@ -1,8 +1,17 @@
 module.exports = {
-  "maxConcurrency": 0,
+  "maxConcurrency": 3,
   "verbose": true,
   "roots": [
-    "<rootDir>/test"
+    "<rootDir>/src"
+  ],
+  "collectCoverageFrom": [
+    "**/*.ts",
+    "!**/index.ts",
+    "!**/types.ts",
+    "!**/*.test.ts",
+    "!**/tests/**/*.ts",
+    "!**/node_modules/**",
+    "!**/vendor/**"
   ],
   "transform": {
     "^.+\\.tsx?$": "ts-jest"
