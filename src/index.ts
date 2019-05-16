@@ -1,5 +1,6 @@
 import { Collection } from './Collection';
-import { Repository } from './Repository';
+import { Firepanda } from './Firepanda';
+import { WhereClause } from './Query';
 
 export * from './types';
-export { Collection, Repository };
+export { Collection, Firepanda, WhereClause };

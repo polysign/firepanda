@@ -1,7 +1,7 @@
-import { Collection, Repository } from '../../index';
-import { BlogPostComment } from './BlogPostComment';
+import { Collection, Firepanda } from '../../index';
+import { BlogPostComments } from './BlogPostComments';
 
-@Collection({
+@Firepanda({
   name: 'blog-posts',
   schema: {
     author: { type: 'string', required: true },
@@ -10,10 +10,10 @@ import { BlogPostComment } from './BlogPostComment';
     publicationDate: { type: 'datetime', transform: { handler: (context) => {
       return Date.now();
     }, on: 'create' }},
-    comments: { type: 'collection', name: 'blog-post-comments', className: 'BlogPostComment' }
+    comments: { type: 'collection', name: 'blog-post-comments', className: 'BlogPostComments' }
   },
   hooks: {
     updateAuthorName: { functionName: 'updateAuthor', on: 'create' }
   }
 })
-export class BlogPost extends Repository { }
+export class BlogPost extends Collection { }

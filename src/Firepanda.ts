@@ -1,6 +1,6 @@
 import * as firebase from 'firebase';
 
-interface CollectionSchemaDefinition {
+interface FirepandaSchemaDefinition {
   type: string;
   name?: string;
   default?: any;
@@ -9,21 +9,21 @@ interface CollectionSchemaDefinition {
   transform?: TransformationFunctioin;
 }
 
-interface CollectionRuleDefinition {
+interface FirepandaRuleDefinition {
   isAuthenticated: Boolean;
   equal?: string[];
 }
 
-interface CollectionHook {
+interface FirepandaHook {
   on: 'create' | 'write' | 'delete';
   functionName?: string;
 }
 
-interface CollectionParams {
+interface FirepandaParams {
   name: string;
-  schema: { [name: string]: CollectionSchemaDefinition };
-  rules: { [name: string]: CollectionRuleDefinition }
-  hooks?: { [name: string]: CollectionHook };
+  schema: { [name: string]: FirepandaSchemaDefinition };
+  rules: { [name: string]: FirepandaRuleDefinition }
+  hooks?: { [name: string]: FirepandaHook };
 }
 
 interface TransformationFunctioin {
@@ -31,32 +31,27 @@ interface TransformationFunctioin {
   on?: 'create' | 'write' | 'delete';
 }
 
-export function Collection(params: CollectionParams) {
+export function Firepanda(params: FirepandaParams) {
   return function<T extends {new(...args:any[]):{}}>(constructor: T) {
     return class extends constructor {
-      firebase: firebase.app.App;
-      documentPath: string;
+      firebaseApp: firebase.app.App;
       collectionName: string = params.name;
       collectionSchema: any = params.schema;
-
-      data: any;
-      docRef: firebase.firestore.DocumentReference;
+      collectionRef: firebase.firestore.CollectionReference;
 
       constructor(...args: any[]) {
         super();
-        this.firebase = args[0];
-        this.data = {};
+        this.firebaseApp = args[0];
 
-        if (args[1]) {
-          this.documentPath = [this.collectionName, args[1]].join('/');
-          this.docRef = this.__getDocRef();
+        if (this.collectionName && this.collectionName.length > 0) {
+          this.collectionRef = this.__getCollectionRef();
         } else {
-          this.data = this.__injectDefaults();
+          throw new Error('Missing collection name');
         }
       }
 
-      __getDocRef() {
-        return this.firebase.firestore().doc(this.documentPath);
+      __getCollectionRef() {
+        return this.firebaseApp.firestore().collection(this.collectionName);
       }
 
       __injectDefaults() {
@@ -93,21 +88,63 @@ export function Collection(params: CollectionParams) {
       __afterSaveHook() {
         console.log('afterSaveHook');
       }
+      
+      __beforeDeleteHook() {
+        console.log('beforeDeleteHook');
+      }
+
+      __afterDeleteHook() {
+        console.log('afterDeleteHook');
+      }
 
       // save() {
       //   this.__beforeSaveHook();
       //   console.log('SAVE FROM COLL');
       //   this.__afterSaveHook();
       // }
+
+      async add(data: any, documentId?: string): Promise<string> {
+        let docRef: firebase.firestore.DocumentReference;
+
+        if (documentId) {
+          docRef = this.collectionRef.doc(documentId);
+          await docRef.set(data);
+        } else {
+          docRef = await this.collectionRef.add(data);
+        }
+
+        return docRef.id;
+      }
       
-      loadData() {
-        // console.log(this);
-        // const a = new this.collectionSchema();
-        // console.log({a})
-        // const keys = Object.keys(new this.collectionSchema())
-        // console.log({keys});
-        // console.log(this.collectionSchema());
-        console.log('loading...');
+      async get(documentId: string): Promise<any> {
+        const docRef = this.collectionRef.doc(documentId);
+        const docSnapshot = await docRef.get();
+
+        if (docSnapshot.exists) {
+          return Object.assign(docSnapshot.data(), {_id: documentId});
+        }
+        return null;        
+      }
+
+      async getAll(): Promise<any[]> {
+        const querySnapshot: firebase.firestore.QuerySnapshot = await this.collectionRef.get();
+        const items: any[] = querySnapshot.docs.map((doc: firebase.firestore.QueryDocumentSnapshot) => {
+          return Object.assign(doc.data(), {_id: doc.id});
+        });
+
+        return items;
+      }
+      
+      async delete(documentId: string): Promise<boolean> {
+        const docRef = this.collectionRef.doc(documentId);
+
+        const docSnapshot = await docRef.get();
+        if (docSnapshot.exists) {
+          await docRef.delete();
+          return true;
+        }
+
+        return false;
       }
     }
   }

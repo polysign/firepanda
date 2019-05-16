@@ -1,9 +1,9 @@
-import { Collection, Repository } from '../../index';
+import { Collection, Firepanda } from '../../index';
 
-@Collection({
+@Firepanda({
   name: 'users',
   schema: {
-    _id: { type: 'string', transform: { handler: async (context: User) => {
+    _id: { type: 'string', transform: { handler: async (context: any) => {
       return context.data.uid;
     }, on: 'write' }},
     uid: { type: 'string', required: true },
@@ -23,9 +23,9 @@ import { Collection, Repository } from '../../index';
     sendWelcomeEmail: { on: 'create' }
   }
 })
-export class User extends Repository { }
+export class UsersCollection extends Collection { }
 
-export const UserFixture = {
+export const UsersFixture = {
   '1': {
     uid: '1',
     displayName: 'Georges',

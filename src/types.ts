@@ -1,7 +1,12 @@
-import { Collection, Repository } from './index';
+import { Collection, Firepanda, WhereClause } from './index';
 
-export interface IRepository {
-  save(data: any): Promise<any>;
+export interface ICollection {
+  get(documentId?: string): Promise<any>;
+  getAll(): Promise<{}[]>;
+  update(documentId: string, data: {}): Promise<any>;
+  add(data: any, documentId?: string): Promise<string>;
+  delete(documentId?: string): Promise<boolean>;
+  query(queryItems: WhereClause[]): Promise<any[]>;
 }
 
-export { Collection, Repository };
+export { Collection, Firepanda };
