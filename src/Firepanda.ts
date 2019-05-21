@@ -1,4 +1,5 @@
 import * as firebase from 'firebase';
+import { WhereClause } from './Query';
 
 interface FirepandaSchemaDefinition {
   type: string;
@@ -102,19 +103,6 @@ export function Firepanda(params: FirepandaParams) {
       //   console.log('SAVE FROM COLL');
       //   this.__afterSaveHook();
       // }
-
-      async add(data: any, documentId?: string): Promise<string> {
-        let docRef: firebase.firestore.DocumentReference;
-
-        if (documentId) {
-          docRef = this.collectionRef.doc(documentId);
-          await docRef.set(data);
-        } else {
-          docRef = await this.collectionRef.add(data);
-        }
-
-        return docRef.id;
-      }
       
       async get(documentId: string): Promise<any> {
         const docRef = this.collectionRef.doc(documentId);
@@ -123,6 +111,7 @@ export function Firepanda(params: FirepandaParams) {
         if (docSnapshot.exists) {
           return Object.assign(docSnapshot.data(), {_id: documentId});
         }
+
         return null;        
       }
 
@@ -135,16 +124,77 @@ export function Firepanda(params: FirepandaParams) {
         return items;
       }
       
-      async delete(documentId: string): Promise<boolean> {
+      async update(documentId: string, data: any): Promise<boolean> {
         const docRef = this.collectionRef.doc(documentId);
-
         const docSnapshot = await docRef.get();
-        if (docSnapshot.exists) {
-          await docRef.delete();
-          return true;
+
+        if (!docSnapshot.exists) {
+          return false;
         }
 
-        return false;
+        try {
+          await docRef.update(data);
+        } catch(e) { return false; }
+
+        return true;
+      }
+
+      async add(data: any, documentId?: string): Promise<string> {
+        let docRef: firebase.firestore.DocumentReference;
+        
+        if (documentId) {
+          const existingDoc = await this.get(documentId);
+          if (existingDoc) {
+            throw new Error(`Document does already exist with id ${documentId}`);
+          }
+        }
+
+        if ([undefined, null].includes(data)) {
+          throw new Error('Data is undefined or null');
+        }
+
+        if (documentId) {
+          docRef = this.collectionRef.doc(documentId);
+          await docRef.set(data);
+        } else {
+          docRef = await this.collectionRef.add(data);
+        }
+
+        return docRef.id;
+      }
+
+      async delete(documentId: string): Promise<boolean> {
+        const docRef = this.collectionRef.doc(documentId);
+        const docSnapshot = await docRef.get();
+
+        if (!docSnapshot.exists) {
+          throw new Error(`Document does not exist with id ${documentId}`);
+        }
+
+        await docRef.delete();
+        return true;
+      }
+
+      async query(queryItems: WhereClause[], limit?: number, orderBy?: string, order: 'asc' | 'desc' = 'asc'): Promise<any[]> {
+        let collectionQuery: firebase.firestore.Query = this.collectionRef;
+        queryItems.map((queryItem: WhereClause) => {
+          collectionQuery = collectionQuery.where(queryItem.field, queryItem.comparator as firebase.firestore.WhereFilterOp, queryItem.value);
+        });
+
+        if (limit) {
+          collectionQuery = collectionQuery.limit(limit);
+        }
+
+        if (orderBy) {
+          collectionQuery = collectionQuery.orderBy(orderBy, order);
+        }
+
+        const querySnapshot = await collectionQuery.get();
+        const documents = querySnapshot.docs.map((docSnapshot: firebase.firestore.QueryDocumentSnapshot) => {
+          return docSnapshot.data();
+        });
+        
+        return documents;  
       }
     }
   }

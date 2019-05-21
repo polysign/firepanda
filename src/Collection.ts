@@ -11,8 +11,8 @@ export class Collection implements ICollection {
    */
   public async get(documentId?: string): Promise<any> { /* STUB */ return await null; }
   public async getAll(): Promise<any[]> { /* STUB */ return await []; }
-  public async update(documentId: string, data: {}): Promise<any> { /* STUB */ return await []; }
+  public async update(documentId: string, data: {}): Promise<boolean> { /* STUB */ return await true; }
   public async add(data: any, documentId?: string): Promise<string> { /* STUB */ return await ''; }
   public async delete(documentId?: string): Promise<boolean> { /* STUB */ return await true; }
-  public async query(queryItems: WhereClause[]): Promise<any[]> { /* STUB */ return await []; }
+  public async query(queryItems: WhereClause[], limit?: number, orderBy?: string, order: 'asc' | 'desc' = 'asc'): Promise<any[]> { /* STUB */ return await []; }
 }
