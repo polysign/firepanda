@@ -1,5 +1,5 @@
 import * as firebase from 'firebase';
-import { WhereClause } from './Query';
+import { Query, WhereClause } from './Query';
 
 interface FirepandaSchemaDefinition {
   type: string;
@@ -77,8 +77,30 @@ export function Firepanda(params: FirepandaParams) {
         return data;
       }
 
-      __beforeSaveHook() {
-        console.log('beforeSaveHook');
+      async __handleTransform() {
+        //
+      }
+
+      async __beforeAddHook(data: any, documentId?: string): Promise<[string|null, any]> {
+        let docId = null;
+
+        if (data && this.collectionSchema._id && this.collectionSchema._id.transform) {
+          docId = await this.collectionSchema._id.transform.handler(data);
+        }
+
+        if (!docId && documentId) {
+          docId = documentId;
+        }
+
+        return [ docId, data ];
+      }
+      
+      async __afterAddHook(docRef: firebase.firestore.DocumentReference, data: any): Promise<any> {
+        return data;
+      }
+
+      async __beforeUpdateHook(docRef: firebase.firestore.DocumentReference, data: any): Promise<any>  {
+        // console.log('beforeSaveHook');
         // Object.keys(this.collectionSchema).forEach((key) => {
         //   if (this.collectionSchema[key].transform) {
         //     this.data[key] = this.collectionSchema[key].transform(this);
@@ -86,23 +108,17 @@ export function Firepanda(params: FirepandaParams) {
         // })
       }
       
-      __afterSaveHook() {
-        console.log('afterSaveHook');
+      async __afterUpdateHook(docRef: firebase.firestore.DocumentReference, data: any): Promise<any>  {
+        // console.log('afterSaveHook');
       }
       
-      __beforeDeleteHook() {
-        console.log('beforeDeleteHook');
+      async __beforeDeleteHook(docRef: firebase.firestore.DocumentReference): Promise<any> {
+        // console.log('beforeDeleteHook');
       }
 
-      __afterDeleteHook() {
-        console.log('afterDeleteHook');
+      async __afterDeleteHook(docRef: firebase.firestore.DocumentReference): Promise<any> {
+        // console.log('afterDeleteHook');
       }
-
-      // save() {
-      //   this.__beforeSaveHook();
-      //   console.log('SAVE FROM COLL');
-      //   this.__afterSaveHook();
-      // }
       
       async get(documentId: string): Promise<any> {
         const docRef = this.collectionRef.doc(documentId);
@@ -133,19 +149,22 @@ export function Firepanda(params: FirepandaParams) {
         }
 
         try {
+          await this.__beforeUpdateHook(docRef, data);
           await docRef.update(data);
+          await this.__afterUpdateHook(docRef, data);
         } catch(e) { return false; }
 
         return true;
       }
 
       async add(data: any, documentId?: string): Promise<string> {
+        const [ docId, docData ] = await this.__beforeAddHook(data, documentId);
         let docRef: firebase.firestore.DocumentReference;
-        
-        if (documentId) {
-          const existingDoc = await this.get(documentId);
+
+        if (docId) {
+          const existingDoc = await this.get(docId);
           if (existingDoc) {
-            throw new Error(`Document does already exist with id ${documentId}`);
+            throw new Error(`Document does already exist with id ${docId}`);
           }
         }
 
@@ -153,12 +172,14 @@ export function Firepanda(params: FirepandaParams) {
           throw new Error('Data is undefined or null');
         }
 
-        if (documentId) {
-          docRef = this.collectionRef.doc(documentId);
-          await docRef.set(data);
+        if (docId) {
+          docRef = this.collectionRef.doc(docId);
+          await docRef.set(docData);
         } else {
-          docRef = await this.collectionRef.add(data);
+          docRef = await this.collectionRef.add(docData);
         }
+
+        await this.__afterAddHook(docRef, docData);
 
         return docRef.id;
       }
@@ -171,22 +192,37 @@ export function Firepanda(params: FirepandaParams) {
           throw new Error(`Document does not exist with id ${documentId}`);
         }
 
+        await this.__beforeDeleteHook(docRef);
         await docRef.delete();
+        await this.__afterDeleteHook(docRef);
+
         return true;
       }
 
-      async query(queryItems: WhereClause[], limit?: number, orderBy?: string, order: 'asc' | 'desc' = 'asc'): Promise<any[]> {
+      async query(query: Query): Promise<any[]> {
         let collectionQuery: firebase.firestore.Query = this.collectionRef;
-        queryItems.map((queryItem: WhereClause) => {
-          collectionQuery = collectionQuery.where(queryItem.field, queryItem.comparator as firebase.firestore.WhereFilterOp, queryItem.value);
-        });
 
-        if (limit) {
-          collectionQuery = collectionQuery.limit(limit);
+        if (Object.keys(query).length === 0) {
+          throw new Error('Query object missing');
         }
 
-        if (orderBy) {
-          collectionQuery = collectionQuery.orderBy(orderBy, order);
+        if (Object.keys(query).map((queryKey) => ['where', 'limit', 'orderBy'].includes(queryKey)).filter(Boolean).length === 0) {
+          throw new Error('Query object malformed');
+        }
+
+        if (query.where) {
+          query.where.map((queryItem: WhereClause) => {
+            collectionQuery = collectionQuery.where(queryItem.field, queryItem.comparator as firebase.firestore.WhereFilterOp, queryItem.value);
+          });
+        } 
+
+        if (query.limit) {
+          collectionQuery = collectionQuery.limit(query.limit);
+        }
+
+        if (query.orderBy) {
+          query.orderDirection === undefined ? query.orderDirection = 'asc' : query.orderDirection;
+          collectionQuery = collectionQuery.orderBy(query.orderBy, query.orderDirection);
         }
 
         const querySnapshot = await collectionQuery.get();

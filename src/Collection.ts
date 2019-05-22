@@ -1,5 +1,5 @@
 import { ICollection } from "./types";
-import { WhereClause } from "./Query";
+import { Query, WhereClause } from "./Query";
 
 export class Collection implements ICollection {
   firebase: firebase.app.App;
@@ -14,5 +14,5 @@ export class Collection implements ICollection {
   public async update(documentId: string, data: {}): Promise<boolean> { /* STUB */ return await true; }
   public async add(data: any, documentId?: string): Promise<string> { /* STUB */ return await ''; }
   public async delete(documentId?: string): Promise<boolean> { /* STUB */ return await true; }
-  public async query(queryItems: WhereClause[], limit?: number, orderBy?: string, order: 'asc' | 'desc' = 'asc'): Promise<any[]> { /* STUB */ return await []; }
+  public async query(query: Query): Promise<any[]> { /* STUB */ return await []; }
 }

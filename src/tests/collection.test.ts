@@ -1,8 +1,7 @@
 import firebaseConfig from '../../.secret/firebase.conf';
 import { setupFirebase } from './helpers/firebaseHelper';
-import { setupFixtures, teardownFixtures } from './helpers/fixturesHelper';
 
-import { UsersCollection, UsersFixture } from './collections/Users';
+import { UsersCollection } from './collections/Users';
 import { WhereClause } from '../Query';
 
 let firebaseApp: firebase.app.App;
@@ -13,7 +12,7 @@ beforeAll(async () => {
   Users = new UsersCollection(firebaseApp);
 });
 
-afterEach(async () => {
+beforeEach(async () => {
   const users = await Users.getAll();
   await Promise.all(users.map(async (user) => {
     return await Users.delete(user._id);
@@ -25,9 +24,6 @@ describe('Collections > Get', () => {
     test('it should return null', async () => {
       // Given
       const documentId = 'user-id-1234';
-      try {
-        await Users.delete(documentId);
-      } catch (e) { /* */ }
 
       // When
       const user = await Users.get(documentId);
@@ -39,11 +35,8 @@ describe('Collections > Get', () => {
   describe('Get document which exists', () => {
     test('it should return the document from the database', async () => {
       // Given
-      const documentId = 'user-id-1234';
+      const documentId = 'user-id-1234-001';
       const data = { name: 'fakeUser' };
-      try {
-        await Users.delete(documentId);
-      } catch (e) { /* */ }
       await Users.add(data, documentId);
 
       // When
@@ -93,9 +86,6 @@ describe('Collections > update', () => {
     test('it should not update any document in the database', async () => {
       // Given
       const documentId = 'user-id-1234';
-      try {
-        await Users.delete(documentId);
-      } catch (e) { /* */ }
 
       // When
       const updateResult = await Users.update(documentId, {fake: 'data'});
@@ -110,9 +100,6 @@ describe('Collections > update', () => {
     test('it should update the document in the database', async () => {
       // Given
       const documentId = 'user-id-1234';
-      try {
-        await Users.delete(documentId);
-      } catch (e) { /* */ }
       await Users.add({ fake: 'data' }, documentId);
 
       // When
@@ -227,14 +214,12 @@ describe('Collections > query', () => {
   describe('Querying documents that do not exist', () => {
     test('it should return no documents', async () => {
       // Given
-      const users = await Users.getAll();
-      await Promise.all(users.map(async (user) => {
-        return Users.delete(user.id);
-      }));
+      const whereClause: WhereClause = { field: 'name', comparator: '==', value: 'fake' };
 
       // When
-      const whereClause: WhereClause = { field: 'name', comparator: '==', value: 'fake' };
-      const userDocs = await Users.query([whereClause]);
+      const userDocs = await Users.query({
+        where: [whereClause]
+      });
 
       // Then
       expect(userDocs.length).toBe(0);
@@ -243,10 +228,6 @@ describe('Collections > query', () => {
   describe('Querying documents with multiple where clauses', () => {
     test('it should return documents', async () => {
       // Given
-      const users = await Users.getAll();
-      await Promise.all(users.map(async (user) => {
-        return Users.delete(user.id);
-      }));
       await Users.add({ name: 'Georges', height: 168 });
       await Users.add({ name: 'Laurent', height: 197 });
       await Users.add({ name: 'Isabelle', height: 162 });
@@ -256,7 +237,9 @@ describe('Collections > query', () => {
         { field: 'height', comparator: '<=', value: 200 },
         { field: 'height', comparator: '>=', value: 170 }
       ];
-      const userDocs = await Users.query(whereClauses);
+      const userDocs = await Users.query({
+        where: whereClauses
+      });
 
       // Then
       expect(userDocs[0]).toEqual({ name: 'Laurent', height: 197 });
@@ -266,10 +249,6 @@ describe('Collections > query', () => {
   describe('Querying documents with multiple where clauses limiting to a fixed number', () => {
     test('it should return documents', async () => {
       // Given
-      const users = await Users.getAll();
-      await Promise.all(users.map(async (user) => {
-        return Users.delete(user.id);
-      }));
       await Users.add({ name: 'Georges', height: 168 });
       await Users.add({ name: 'Laurent', height: 197 });
       await Users.add({ name: 'Isabelle', height: 162 });
@@ -279,14 +258,70 @@ describe('Collections > query', () => {
         { field: 'height', comparator: '<=', value: 200 },
         { field: 'height', comparator: '>=', value: 165 }
       ];
-      const userDocs = await Users.query(whereClauses, 1);
+      const userDocs = await Users.query({
+        where: whereClauses,
+        limit: 1
+      });
 
       // Then
-      console.log({userDocs})
       expect(userDocs.length).toBe(1);
     });
   });
   describe('Querying documents with custom ordering', () => {
+    test('it should return documents', async () => {
+      // Given
+      await Users.add({ name: 'Georges', height: 168 });
+      await Users.add({ name: 'Laurent', height: 197 });
+      await Users.add({ name: 'Isabelle', height: 162 });
+      const whereClauses: WhereClause[] = [
+        { field: 'height', comparator: '<=', value: 200 },
+        { field: 'height', comparator: '>=', value: 165 }
+      ];
 
+      // When
+      const userDocs = await Users.query({
+        where: whereClauses,
+        orderBy: 'height',
+        orderDirection: 'desc'
+      });
+
+      // Then
+      expect(userDocs.length).toBe(2);
+      expect(userDocs[0].name).toBe('Laurent');
+      expect(userDocs[1].name).toBe('Georges');
+    });
+  });
+  describe('Querying documents with empty query object', () => {
+    test('it should throw an error', async () => {
+      // Given
+      let error = null;
+
+      // When
+      try {
+        await Users.query({});
+      } catch(e) {
+        error = e.message;
+      }
+
+      // Then
+      expect(error).toBe('Query object missing');      
+    });
+  });
+  describe('Querying documents with a malformed query object', () => {
+    test('it should throw an error', async () => {
+      // Given
+      let error = null;
+
+      // When
+      try {
+        // @ts-ignore
+        await Users.query({whatever: 'this is wrong'});
+      } catch(e) {
+        error = e.message;
+      }
+
+      // Then
+      expect(error).toBe('Query object malformed');      
+    });
   });
 });

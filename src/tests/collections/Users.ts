@@ -3,8 +3,8 @@ import { Collection, Firepanda } from '../../index';
 @Firepanda({
   name: 'users',
   schema: {
-    _id: { type: 'string', transform: { handler: async (context: any) => {
-      return context.data.uid;
+    _id: { type: 'string', transform: { handler: async (data: any) => {
+      return data.uid;
     }, on: 'write' }},
     uid: { type: 'string', required: true },
     displayName: { type: 'string' },
@@ -24,17 +24,3 @@ import { Collection, Firepanda } from '../../index';
   }
 })
 export class UsersCollection extends Collection { }
-
-export const UsersFixture = {
-  '1': {
-    uid: '1',
-    displayName: 'Georges',
-    email: 'fire@panda.com',
-    photoUrl: 'http://'
-  },
-  '2': {
-    uid: '2',
-    displayName: 'Antpny',
-    email: 'ant@panda.com'
-  },
-}

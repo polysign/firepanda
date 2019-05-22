@@ -9,4 +9,8 @@ export interface ICollection {
   query(queryItems: WhereClause[]): Promise<any[]>;
 }
 
+export interface IDocument {
+  
+}
+
 export { Collection, Firepanda };
