@@ -3,3 +3,4 @@
 /.secret
 firebase-debug.log
 firestore-debug.log
+debug.log
