@@ -4,7 +4,6 @@ import * as firebaseTesting from '@firebase/testing'
 
 export const setupFirebase = async (): Promise<firebase.app.App> => {
   const projectId = `firepanda-${Date.now()}`;
-  console.info(`Project ID: ${projectId}`);
   const app = firebaseTesting.initializeTestApp({
     projectId: projectId,
     auth: { uid: "user-id-1234", email: "test@user.com" }
