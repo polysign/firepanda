@@ -1,3 +1,5 @@
 /node_modules
 /lib
 /.secret
+firebase-debug.log
+firestore-debug.log

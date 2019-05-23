@@ -8,7 +8,7 @@ let firebaseApp: firebase.app.App;
 let Users: UsersCollection;
 
 beforeAll(async () => {
-  firebaseApp = await setupFirebase(firebaseConfig);
+  firebaseApp = await setupFirebase();
   Users = new UsersCollection(firebaseApp);
 });
 

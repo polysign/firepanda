@@ -12,5 +12,3 @@ export interface WhereClause {
   value: any;
   comparator: '<' | '<=' | '==' | '>=' | '>' | 'array_contains';
 }
-
-export { WhereClause }

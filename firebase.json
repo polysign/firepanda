@@ -23,5 +23,10 @@
   },
   "storage": {
     "rules": "./firebase/storage.rules"
+  },
+  "emulators": {
+    "firestore": {
+      "port": "8080"
+    }
   }
 }

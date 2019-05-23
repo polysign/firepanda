@@ -1,4 +1,3 @@
-import firebaseConfig from '../../.secret/firebase.conf';
 import { setupFirebase } from './helpers/firebaseHelper';
 
 import { UsersCollection } from './collections/Users';
@@ -8,7 +7,7 @@ let firebaseApp: firebase.app.App;
 let Users: UsersCollection;
 
 beforeAll(async () => {
-  firebaseApp = await setupFirebase(firebaseConfig);
+  firebaseApp = await setupFirebase();
   Users = new UsersCollection(firebaseApp);
 });
 

@@ -1,7 +1,19 @@
+import * as fs from 'fs';
 import * as firebase from 'firebase';
+import * as firebaseTesting from '@firebase/testing'
 
-export const setupFirebase = async (firebaseConfig): Promise<firebase.app.App> => {
-  firebase.initializeApp(firebaseConfig);
-  await firebase.auth().signInWithEmailAndPassword(firebaseConfig.user.email, firebaseConfig.user.password);
-  return firebase.app();
+export const setupFirebase = async (): Promise<firebase.app.App> => {
+  const projectId = `firepanda-${Date.now()}`;
+  console.info(`Project ID: ${projectId}`);
+  const app = firebaseTesting.initializeTestApp({
+    projectId: projectId,
+    auth: { uid: "user-id-1234", email: "test@user.com" }
+  });
+
+  await firebaseTesting.loadFirestoreRules({
+    projectId: projectId,
+    rules: fs.readFileSync("./firebase/firestore.rules", "utf8")
+  });
+    
+  return app;
 }

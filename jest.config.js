@@ -1,5 +1,5 @@
 module.exports = {
-  "maxConcurrency": 1,
+  "maxConcurrency": 5,
   "verbose": true,
   "roots": [
     "<rootDir>/src"
