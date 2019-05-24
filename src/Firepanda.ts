@@ -77,6 +77,49 @@ export function Firepanda(params: FirepandaParams) {
         return data;
       }
 
+      __toBoolean(value: any): boolean {
+        if (Array.isArray(value) && value.length > 0) {
+          return true;
+        }
+
+        switch(typeof value) {
+          case 'string':
+            return value.toLowerCase() === 'yes' ? true : false;
+          case 'number':
+            return value !== 0 ? true : false;
+          case 'boolean':
+            return value;
+        }
+
+        return false;
+      }
+
+      __cleanData(data: any): any {
+        Object.keys(data).forEach((objectKey) => {
+          if (objectKey !== '_id' && this.collectionSchema[objectKey]) { 
+            switch(this.collectionSchema[objectKey].type) {
+              case 'string':
+                data[objectKey] = data[objectKey].toString();
+                break;
+              case 'number':
+                data[objectKey] = Number(data[objectKey]);
+                break;
+              case 'boolean':
+                data[objectKey] = this.__toBoolean(data[objectKey]);
+                break;
+              case 'array':
+                data[objectKey] = Array.from(data[objectKey]).filter(Boolean);
+                break;
+              case 'map':
+                data[objectKey] = Object.assign({}, data[objectKey]);
+                break;
+            }
+          }
+        });
+
+        return data;
+      }
+
       async __handleTransform() {
         //
       }
@@ -158,7 +201,7 @@ export function Firepanda(params: FirepandaParams) {
       }
 
       async add(data: any, documentId?: string): Promise<string> {
-        const [ docId, docData ] = await this.__beforeAddHook(data, documentId);
+        const [ docId, docData ] = await this.__beforeAddHook(Object.assign({}, data), documentId);
         let docRef: firebase.firestore.DocumentReference;
 
         if (docId) {
@@ -174,7 +217,7 @@ export function Firepanda(params: FirepandaParams) {
 
         if (docId) {
           docRef = this.collectionRef.doc(docId);
-          await docRef.set(docData);
+          await docRef.set(this.__cleanData(docData));
         } else {
           docRef = await this.collectionRef.add(docData);
         }

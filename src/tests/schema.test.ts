@@ -53,3 +53,208 @@ describe('Schema > _id > transform', () => {
     });
   });
 });
+
+describe('Schema > Types', () => {
+  describe('String', () => {
+    describe('Storing data of the correct datatype', () => {
+      test('it should store the data without modifying it', async () => {
+        // Given
+        const data = {
+          uid: 'user-id-2000',
+          displayName: 'Mr Universe',
+          email: 'mr@universe.net'
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(typeof userDocument.uid).toBe('string');
+        expect(userDocument.uid).toBe(data.uid);
+        expect(userDocument._id).toBe(documentId);
+      });
+    });
+    describe('Storing data of a different datatype', () => {
+      test('it should store the data, trying to modify it', async () => {
+        // Given
+        const data = {
+          uid: '2000',
+          displayName: 1337,
+          email: 'mr@universe.net'
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(typeof userDocument.uid).toBe('string');
+        expect(typeof userDocument.displayName).toBe('string');
+        expect(userDocument.displayName).not.toBe(data.displayName);
+        expect(userDocument.displayName).toBe(data.displayName.toString());
+      });
+    });
+  });
+  describe('Number', () => {
+    describe('Storing data of the correct datatype', () => {
+      test('it should store the data without modifying it', async () => {
+        // Given
+        const data = {
+          uid: 'user-id-2000',
+          displayName: 'Mr Universe',
+          email: 'mr@universe.net',
+          age: 20
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(typeof userDocument.age).toBe('number');
+        expect(userDocument.age).toBe(data.age);
+      });
+    });
+    describe('Storing data of a different datatype', () => {
+      test('it should store the data, trying to modify it', async () => {
+        // Given
+        const data = {
+          uid: '2000',
+          displayName: 1337,
+          email: 'mr@universe.net',
+          age: '22'
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(typeof userDocument.age).toBe('number');
+        expect(userDocument.age).not.toBe(data.age);
+        expect(userDocument.age).toBe(Number(data.age));
+      });
+    });
+  });
+  describe('Boolean', () => {
+    describe('Storing data of the correct datatype', () => {
+      test('it should store the data without modifying it', async () => {
+        // Given
+        const data = {
+          uid: 'user-id-2000',
+          displayName: 'Mr Universe',
+          email: 'mr@universe.net',
+          age: 20,
+          active: true
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(typeof userDocument.active).toBe('boolean');
+        expect(userDocument.active).toBe(data.active);
+      });
+    });
+    describe('Storing data of a different datatype', () => {
+      test('it should store the data, trying to modify it', async () => {
+        // Given
+        const data = {
+          uid: '2000',
+          displayName: 1337,
+          email: 'mr@universe.net',
+          age: '22',
+          active: 'yes'
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(typeof userDocument.active).toBe('boolean');
+        expect(userDocument.active).not.toBe(data.active);
+        expect(userDocument.active).toBe(true);
+      });
+    });
+  });
+  describe('Array', () => {
+    describe('Storing data of the correct datatype', () => {
+      test('it should store the data without modifying it', async () => {
+        // Given
+        const data = {
+          uid: 'user-id-2000',
+          displayName: 'Mr Universe',
+          email: 'mr@universe.net',
+          age: 20,
+          active: true,
+          roles: ['admin', 'manager']
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(Array.isArray(userDocument.roles)).toBeTruthy();
+        expect(userDocument.roles.length).toBe(data.roles.length);
+        expect(userDocument.roles).toMatchObject(data.roles);
+      });
+    });
+    describe('Storing data of the correct datatype but with empty values in the array', () => {
+      test('it should store the data, but removing empty values', async () => {
+        // Given
+        const data = {
+          uid: 'user-id-2000',
+          displayName: 'Mr Universe',
+          email: 'mr@universe.net',
+          age: 20,
+          active: true,
+          roles: ['admin', 'manager', null, null, 'contributor']
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(Array.isArray(userDocument.roles)).toBeTruthy();
+        expect(userDocument.roles.length).toBe(data.roles.length - 2);
+        expect(userDocument.roles).toMatchObject(data.roles.filter(Boolean));
+      });
+    });
+  });
+  describe('Map', () => {
+    describe('Storing data of the correct datatype', () => {
+      test('it should store the data without modifying it', async () => {
+        // Given
+        const data = {
+          uid: 'user-id-2000',
+          preferences: {
+            canDelete: true,
+            canUpdate: false,
+            ageIndex: 129
+          }
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(userDocument.preferences).toMatchObject(data.preferences);
+      });
+    });
+  });
+  describe('Timestamp', () => {
+    //
+  });
+  describe('Geopoint', () => {
+    //
+  });
+  describe('Reference', () => {
+    //
+  });
+});

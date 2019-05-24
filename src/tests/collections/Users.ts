@@ -9,7 +9,11 @@ import { Collection, Firepanda } from '../../index';
     uid: { type: 'string', required: true },
     displayName: { type: 'string' },
     email: { type: 'string' },
-    photoUrl: { type: 'string', default: 'http://www.gravatar.com/avatar/1337?d=identicon' }
+    photoUrl: { type: 'string', default: 'http://www.gravatar.com/avatar/1337?d=identicon' },
+    age: { type: 'number', default: 18 },
+    active: { type: 'boolean' },
+    roles: { type: 'array' },
+    preferences: { type: 'map' },
   },
   rules: {
     list: null,

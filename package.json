@@ -6,8 +6,9 @@
   "scripts": {
     "cli:firepanda": "node bin/firepanda",
     "cli": "npm-run-all -l cli:*",
-    "test": "firebase emulators:exec --only firestore \"jest\"",
-    "test:watch": "firebase emulators:exec --only firestore \"jest --watch\""
+    "test:jest": "jest",
+    "test:jest:watch": "jest --watch",
+    "test:firestore:emulator": "firebase emulators:start --only firestore"
   },
   "author": "Georges Jentgen <georges@polysign.lu>",
   "license": "ISC",
