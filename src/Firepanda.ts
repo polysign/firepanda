@@ -1,13 +1,19 @@
 import * as firebase from 'firebase';
 import { Query, WhereClause } from './Query';
 
+type DataEventTypes = 'beforeAdd' | 'afterAdd' | 'beforeUpdate' | 'afterUpdate' | 'beforeDelete' | 'afterDelete';
+
 interface FirepandaSchemaDefinition {
   type: string;
   name?: string;
   default?: any;
   required?: boolean;
   className?: string;
-  transform?: TransformationFunctioin;
+  transform?: TransformationFunction;
+}
+
+interface FirepandaIdDefinition {
+  from?: string;
 }
 
 interface FirepandaRuleDefinition {
@@ -22,14 +28,15 @@ interface FirepandaHook {
 
 interface FirepandaParams {
   name: string;
+  id: FirepandaIdDefinition;
   schema: { [name: string]: FirepandaSchemaDefinition };
   rules: { [name: string]: FirepandaRuleDefinition }
   hooks?: { [name: string]: FirepandaHook };
 }
 
-interface TransformationFunctioin {
-  handler: Function;
-  on?: 'create' | 'write' | 'delete';
+interface TransformationFunction {
+  handler?: Function;
+  on?: DataEventTypes;
 }
 
 export function Firepanda(params: FirepandaParams) {
@@ -37,6 +44,7 @@ export function Firepanda(params: FirepandaParams) {
     return class extends constructor {
       firebaseApp: firebase.app.App;
       collectionName: string = params.name;
+      collectionIdDefinition: FirepandaIdDefinition = params.id;
       collectionSchema: any = params.schema;
       collectionRef: firebase.firestore.CollectionReference;
 
@@ -77,6 +85,20 @@ export function Firepanda(params: FirepandaParams) {
         return data;
       }
 
+      async __handleIdField(data: any, documentId?: string): Promise<[string|null, any]> {
+        let newDocumentId;
+
+        if (this.collectionIdDefinition && this.collectionIdDefinition.from) {
+          newDocumentId = data[this.collectionIdDefinition.from];
+        }
+
+        if (!newDocumentId && documentId) {
+          newDocumentId = documentId;
+        }
+
+        return [ newDocumentId, data ];
+      }
+
       __toBoolean(value: any): boolean {
         if (Array.isArray(value) && value.length > 0) {
           return true;
@@ -92,6 +114,14 @@ export function Firepanda(params: FirepandaParams) {
         }
 
         return false;
+      }
+
+      __handleEvent(fieldSchema: any, value: any): any {
+        switch(fieldSchema.type) {
+          case 'timestamp':
+            value = 123;
+            break;
+        }
       }
 
       __cleanData(data: any): any {
@@ -113,6 +143,9 @@ export function Firepanda(params: FirepandaParams) {
               case 'map':
                 data[objectKey] = Object.assign({}, data[objectKey]);
                 break;
+              case 'timestamp':
+                data[objectKey] = Object.assign({}, data[objectKey]);
+                break;
             }
           }
         });
@@ -120,22 +153,56 @@ export function Firepanda(params: FirepandaParams) {
         return data;
       }
 
-      async __handleTransform() {
-        //
+      async __applyTransform(fieldValue: any, transform: TransformationFunction): Promise<any> {
+        return await transform.handler(fieldValue);
       }
 
-      async __beforeAddHook(data: any, documentId?: string): Promise<[string|null, any]> {
-        let docId = null;
-
-        if (data && this.collectionSchema._id && this.collectionSchema._id.transform) {
-          docId = await this.collectionSchema._id.transform.handler(data);
+      async __applyFieldTransform(fieldValue: any, schemaType: string): Promise<any> {
+        switch(schemaType) {
+          case 'timestamp':
+            return firebase.firestore.Timestamp.now();
         }
 
-        if (!docId && documentId) {
-          docId = documentId;
-        }
+        return fieldValue;
+      }
 
-        return [ docId, data ];
+      async __handleTransform(data: any, event: DataEventTypes): Promise<any> {
+        const promises = [];
+        const transformedData = data;
+
+        Object.keys(this.collectionSchema).forEach(async (fieldKey) => {
+          if (this.collectionSchema[fieldKey].transform && this.collectionSchema[fieldKey].transform.on === event) {
+            if (typeof this.collectionSchema[fieldKey].transform.handler === 'function') {
+              promises.push(new Promise(async (resolve) => {
+                const result = {};
+                transformedData[fieldKey] = await this.__applyTransform(transformedData[fieldKey], this.collectionSchema[fieldKey].transform);
+                result[fieldKey] = transformedData[fieldKey];
+                resolve(result);
+              }));
+            } else {
+              promises.push(new Promise(async (resolve) => {
+                const result = {};
+                transformedData[fieldKey] = await this.__applyFieldTransform(transformedData[fieldKey], this.collectionSchema[fieldKey].type);
+                result[fieldKey] = transformedData[fieldKey];
+                resolve(result);
+              }));
+            }
+          }
+        });
+
+        return Promise.all(promises).then((results) => {
+          let finalData = {};
+          results.forEach((result) => {
+            finalData = Object.assign(transformedData, result);
+          });
+          return finalData;
+        }).catch((err) => {
+          throw err;
+        });
+      }
+
+      async __beforeAddHook(data: any): Promise<any> {
+        return data;
       }
       
       async __afterAddHook(docRef: firebase.firestore.DocumentReference, data: any): Promise<any> {
@@ -201,7 +268,13 @@ export function Firepanda(params: FirepandaParams) {
       }
 
       async add(data: any, documentId?: string): Promise<string> {
-        const [ docId, docData ] = await this.__beforeAddHook(Object.assign({}, data), documentId);
+        if ([undefined, null].includes(data)) {
+          throw new Error('Data is undefined or null');
+        }
+
+        const [ docId, docData ] = await this.__handleIdField(
+          Object.assign({}, await this.__handleTransform(data, 'beforeAdd')
+        ), documentId);
         let docRef: firebase.firestore.DocumentReference;
 
         if (docId) {
@@ -209,10 +282,6 @@ export function Firepanda(params: FirepandaParams) {
           if (existingDoc) {
             throw new Error(`Document does already exist with id ${docId}`);
           }
-        }
-
-        if ([undefined, null].includes(data)) {
-          throw new Error('Data is undefined or null');
         }
 
         if (docId) {

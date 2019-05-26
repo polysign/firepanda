@@ -2,10 +2,10 @@ import { Collection, Firepanda } from '../../index';
 
 @Firepanda({
   name: 'users',
+  id: {
+    from: 'uid'
+  },
   schema: {
-    _id: { type: 'string', transform: { handler: async (data: any) => {
-      return data.uid;
-    }, on: 'write' }},
     uid: { type: 'string', required: true },
     displayName: { type: 'string' },
     email: { type: 'string' },
@@ -14,6 +14,7 @@ import { Collection, Firepanda } from '../../index';
     active: { type: 'boolean' },
     roles: { type: 'array' },
     preferences: { type: 'map' },
+    createdAt: { type: 'timestamp', transform: { on: 'beforeAdd' } },
   },
   rules: {
     list: null,

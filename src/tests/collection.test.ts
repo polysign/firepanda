@@ -242,14 +242,15 @@ describe('Collections > query', () => {
       });
 
       // Then
-      expect(userDocs[0]).toEqual({ name: 'Laurent', height: 197 });
+      expect(userDocs[0]).toMatchObject({ name: 'Laurent', height: 197 });
       expect(userDocs.length).toBe(1);
     });
   });
   describe('Querying documents with multiple where clauses limiting to a fixed number', () => {
     test('it should return documents', async () => {
       // Given
-      await Users.add({ name: 'Georges', height: 168 });
+      const res = await Users.add({ name: 'Georges', height: 168 });
+      console.log(res)
       await Users.add({ name: 'Laurent', height: 197 });
       await Users.add({ name: 'Isabelle', height: 162 });
 
