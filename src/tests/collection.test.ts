@@ -43,7 +43,7 @@ describe('Collections > Get', () => {
       const user = await Users.get(documentId);
 
       // Then
-      expect(user).toEqual(Object.assign(data, {_id: documentId}));
+      expect(user).toMatchObject(Object.assign(data, {_id: documentId}));
     });
   });
 });

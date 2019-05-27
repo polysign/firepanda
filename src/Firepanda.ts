@@ -23,6 +23,7 @@ interface FirepandaRuleDefinition {
 
 interface FirepandaHook {
   on: 'create' | 'write' | 'delete';
+  path: string;
   functionName?: string;
 }
 
@@ -63,22 +64,10 @@ export function Firepanda(params: FirepandaParams) {
         return this.firebaseApp.firestore().collection(this.collectionName);
       }
 
-      __injectDefaults() {
-        const data = {};
+      async __injectDefaults(data: any): Promise<any> {
         Object.keys(this.collectionSchema).forEach((key) => {
-          switch(this.collectionSchema[key].type) {
-            case 'string':
-              data[key] = this.collectionSchema[key].default ? this.collectionSchema[key].default : '';
-              break;
-            case 'number':
-              data[key] = this.collectionSchema[key].default ? this.collectionSchema[key].default : 0;
-              break;
-            case 'array':
-              data[key] = this.collectionSchema[key].default ? this.collectionSchema[key].default : [];
-              break;
-            case 'boolean':
-              data[key] = this.collectionSchema[key].default ? this.collectionSchema[key].default : false;
-              break;
+          if (this.collectionSchema[key].default && (!data[key] || [].concat(data[key]).length === 0)) {
+            data[key] = this.collectionSchema[key].default;
           }
         });
 
@@ -124,7 +113,7 @@ export function Firepanda(params: FirepandaParams) {
         }
       }
 
-      __cleanData(data: any): any {
+      async __cleanData(data: any): Promise<any> {
         Object.keys(data).forEach((objectKey) => {
           if (objectKey !== '_id' && this.collectionSchema[objectKey]) { 
             switch(this.collectionSchema[objectKey].type) {
@@ -146,11 +135,29 @@ export function Firepanda(params: FirepandaParams) {
               case 'timestamp':
                 data[objectKey] = Object.assign({}, data[objectKey]);
                 break;
+              case 'geopoint':
+                if (data[objectKey].constructor !== firebase.firestore.GeoPoint) {
+                  let latitude = 0;
+                  let longitude = 0;
+                  if (data[objectKey].latitude || data[objectKey].lat) {
+                    latitude = data[objectKey].latitude | data[objectKey].lat;
+                  }
+                  if (data[objectKey].longitude || data[objectKey].lng) {
+                    longitude = data[objectKey].longitude | data[objectKey].lng;
+                  }
+
+                  if (latitude && longitude) {
+                    data[objectKey] = new firebase.firestore.GeoPoint(latitude, longitude);
+                  } else {
+                    throw new Error('Unable to create geopoint')
+                  }
+                }
+                break;
             }
           }
         });
 
-        return data;
+        return await this.__injectDefaults(data);
       }
 
       async __applyTransform(fieldValue: any, transform: TransformationFunction): Promise<any> {
@@ -286,7 +293,7 @@ export function Firepanda(params: FirepandaParams) {
 
         if (docId) {
           docRef = this.collectionRef.doc(docId);
-          await docRef.set(this.__cleanData(docData));
+          await docRef.set(await this.__cleanData(docData));
         } else {
           docRef = await this.collectionRef.add(docData);
         }

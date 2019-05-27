@@ -13,7 +13,7 @@
   "author": "Georges Jentgen <georges@polysign.lu>",
   "license": "ISC",
   "bin": {
-    "firepanda": "bin/firepanda"
+    "firepanda": "./cli.js"
   },
   "devDependencies": {
     "@types/jest": "^24.0.12",
@@ -27,9 +27,19 @@
   "dependencies": {
     "@firebase/testing": "^0.9.4",
     "delay": "^4.2.0",
+    "enquirer": "^2.3.0",
+    "execa": "^1.0.0",
     "firebase-admin": "^7.3.0",
     "firebase-functions": "^2.3.1",
+    "fs-extra": "^8.0.1",
+    "meow": "^5.0.0",
+    "mkdirp": "^0.5.1",
     "npm-run-all": "^4.1.5",
     "ora": "^3.4.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@polysign.github.com:polysign/firepanda.git"
+  },
+  "keywords": []
 }

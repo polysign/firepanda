@@ -1,3 +1,4 @@
+import * as firebase from 'firebase';
 import { setupFirebase } from './helpers/firebaseHelper';
 
 import { UsersCollection } from './collections/Users';
@@ -249,12 +250,109 @@ describe('Schema > Types', () => {
     });
   });
   describe('Timestamp', () => {
-    //
+    describe('Storing data of the correct datatype', () => {
+      test('it should store the data without modifying it', async () => {
+        // Given
+        const data = {
+          uid: 'user-id-2000',
+          createdAt: firebase.firestore.Timestamp.now()
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(typeof userDocument.createdAt).toBe('object');
+        expect(userDocument.createdAt).toHaveProperty('nanoseconds')
+        expect(userDocument.createdAt).toHaveProperty('seconds')
+        expect(typeof userDocument.createdAt.nanoseconds).toBe('number');
+        expect(typeof userDocument.createdAt.seconds).toBe('number');
+      });
+    });
+    describe('Storing a javascript timestamp', () => {
+      test('it should store the data by modifying it', async () => {
+        // Given
+        const data = {
+          uid: 'user-id-2000',
+          createdAt: Date.now()
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(typeof userDocument.createdAt).toBe('object');
+        expect(userDocument.createdAt).toHaveProperty('nanoseconds')
+        expect(userDocument.createdAt).toHaveProperty('seconds')
+        expect(typeof userDocument.createdAt.nanoseconds).toBe('number');
+        expect(typeof userDocument.createdAt.seconds).toBe('number');
+      });
+    });
   });
   describe('Geopoint', () => {
-    //
-  });
-  describe('Reference', () => {
-    //
+    describe('Storing data of the correct datatype', () => {
+      test('it should store the data without modifying it', async () => {
+        // Given
+        const data = {
+          uid: 'user-id-2000',
+          position: new firebase.firestore.GeoPoint(20, 39)
+        };
+
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+
+        // Then
+        expect(typeof userDocument.position).toBe('object');
+        expect(userDocument.position.constructor).toBe(firebase.firestore.GeoPoint)
+        expect(userDocument.position).toHaveProperty('longitude')
+        expect(userDocument.position).toHaveProperty('latitude')
+        expect(typeof userDocument.position.longitude).toBe('number');
+        expect(typeof userDocument.position.latitude).toBe('number');
+      });
+    });
+    describe('Storing datapoint from a simple object with the right params', () => {
+      test('it should store the data by modifying it', async () => {
+        // Given
+        const data = {
+          uid: 'user-id-2000',
+          position: { lng: 23, lat: -90 }
+        };
+        
+        // When
+        const documentId = await Users.add(data);
+        const userDocument = await Users.get(documentId);
+        
+        // Then
+        expect(typeof userDocument.position).toBe('object');
+        expect(userDocument.position.constructor).toBe(firebase.firestore.GeoPoint)
+        expect(userDocument.position).toHaveProperty('longitude')
+        expect(userDocument.position).toHaveProperty('latitude')
+        expect(typeof userDocument.position.longitude).toBe('number');
+        expect(typeof userDocument.position.latitude).toBe('number');
+      });
+    });
+    describe('Storing datapoint from a simple object with the wrong params', () => {
+      test('it should raise an error', async () => {
+        // Given
+        let error = null;
+        const data = {
+          uid: 'user-id-2000',
+          position: { lng: 23, lati: -90 }
+        };
+        
+        // When
+        try {
+          await Users.add(data);
+        } catch (e) {
+          error = e.message;
+        }
+        
+        // Then
+        expect(error).toBe('Unable to create geopoint')
+      });
+    });
   });
 });

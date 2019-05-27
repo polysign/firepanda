@@ -14,6 +14,7 @@ import { Collection, Firepanda } from '../../index';
     active: { type: 'boolean' },
     roles: { type: 'array' },
     preferences: { type: 'map' },
+    position: { type: 'geopoint' },
     createdAt: { type: 'timestamp', transform: { on: 'beforeAdd' } },
   },
   rules: {
@@ -24,8 +25,20 @@ import { Collection, Firepanda } from '../../index';
     delete: null
   },
   hooks: {
-    removeAllUserData: { on: 'delete' },
-    sendWelcomeEmail: { on: 'create' }
+    removeAllUserData: { path: 'users/{userId}', on: 'delete' },
+    sendWelcomeEmail: { path: 'users/{userId}', on: 'create', functionName: 'otherFunction' }
   }
 })
-export class UsersCollection extends Collection { }
+export class UsersCollection extends Collection {
+
+  removeAllUserData = async (snap, context) => {
+    console.log(snap.data());
+    console.log(context);
+  }
+  
+  otherFunction = async (change, context) => {
+    console.log(change);
+    console.log(context);
+  }
+
+}
