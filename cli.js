@@ -22,80 +22,54 @@ if (cli.input.length === 0) {
 
 const runCli = async () => {
   showBanner();
+  const basePath = getBasePath();
+
   switch(cli.input[0]) {
     case 'init':
-      const projectConfig = await promptProjectDetails();
-      createProject(projectConfig);
+      require(`${basePath}/src/cli/init.js`)();
       break;
     case 'build':
-      buildProject();
+      await buildProject();
       break;
     case 'deploy':
-      console.info('Run deploy script');
+      buildProject();
       break;
   }
   showOutro();
 }
 
-const createProject = async (projectConfig) => {
-  const basePath = getBasePath();
-  const projectBasePath = path.join(process.cwd(), projectConfig.path);
-
-  mkdirp(projectBasePath, async (err) => {
-    if (err) { throw(err); }
-
-    const packageJsonPath = path.join(projectBasePath, 'package.json');
-  
-    await execa('npm', ['init', '-y'], { cwd: projectBasePath });
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath));
-    packageJson.name = String(projectConfig.name).toLowerCase();
-    packageJson.firepanda = {};
-  
-    if (Array.from(projectConfig.features).includes('Firestore')) {
-      packageJson.firepanda['collections'] = {
-        source: 'src/collections',
-        output: 'lib/collections'
-      }
-
-      mkdirp(path.join(projectBasePath, 'src/collections'));
-    }
-    if (Array.from(projectConfig.features).includes('Cloud Functions')) {
-      packageJson.firepanda['functions'] = {
-        source: 'src/functions',
-        output: 'lib/functions'
-      }
-
-      mkdirp(path.join(projectBasePath, 'src/functions'));
-    }
-    if (Array.from(projectConfig.features).includes('Frontend')) {
-      packageJson.firepanda['fontend'] = {
-        source: 'src/frontend',
-        output: 'lib/frontend'
-      }
-
-      mkdirp(path.join(projectBasePath, 'src/frontend'));
-    }
-
-    fs.writeFileSync(path.join(projectBasePath, '.gitignore'), `
-      /lib
-      /node_modules
-      .git
-    `);
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson));
-    await execa('npm', ['install', 'jest'], { cwd: projectBasePath });
-  });
-}
-
 const buildProject = async () => {
   const basePath = getBasePath();
   const projectConfig = identifyProject();
+
+  const build = {
+    firestore: require(`${basePath}/src/cli/build-collections.js`),
+    functions: require(`${basePath}/src/cli/build-functions.js`),
+    frontend: require(`${basePath}/src/cli/build-frontend.js`),
+    storage: require(`${basePath}/src/cli/build-storage.js`)
+  };
+
+  if (cli.input[1] && ['frontend', 'firestore', 'storage', 'functions'].includes(cli.input[1])) {
+    await build[cli.input[1]](projectConfig[cli.input[1]]);
+  } else {
+    await Promise.all(Object.keys(build).map(async (buildKey) => {
+      return await build[buildKey](projectConfig[buildKey]);
+    }));
+  }
 }
 
 const identifyProject = () => {
+  const packageJsonPath = path.join('./', 'package.json');
   try {
-    return JSON.parse(fs.readFileSync(path.join('./', 'firepanda.json')))
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath));
+  
+    if (packageJson.firepanda) {
+      return packageJson.firepanda;
+    } else { 
+      throw new Error('Not a Firepanda project');
+    }
   } catch(e) {
-    throw new Error('Not a Firepanda project folder');
+    throw new Error('Not a Firepanda project');
   }
 }
 
@@ -111,51 +85,10 @@ const getBasePath = () => {
   } 
 }
 
-const promptProjectDetails = async () => {
-  const responses = await prompt([
-    {
-      type: 'input',
-      name: 'name',
-      message: 'Project name'
-    },
-    {
-      type: 'multiselect',
-      name: 'features',
-      message: 'Enabled features',
-      choices: [
-        'Firestore',
-        'Cloud Functions',
-        'Storage',
-        'Frontend'
-      ]
-    },
-    {
-      type: 'confirm',
-      name: 'currentFolder',
-      message: 'Initialize in current folder? [no: define path]'
-    }
-  ]);
-
-  if (!responses.currentFolder) {
-    const pathResponse = await prompt([
-      {
-        type: 'input',
-        name: 'path',
-        message: 'Project path'
-      }
-    ]);
-
-    return Object.assign(responses, pathResponse);
-  } else {
-    return Object.assign({path: '.'}, responses);
-  }
-}
-
 const showBanner = () => {
   console.info('');
   console.info('Firepanda CLI');
   console.info('-------------');
-  console.info('');
 }
 
 const showOutro = () => {
