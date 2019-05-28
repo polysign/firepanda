@@ -16,17 +16,6 @@ import { Collection, Firepanda } from '../../index';
     preferences: { type: 'map' },
     position: { type: 'geopoint' },
     createdAt: { type: 'timestamp', transform: { on: 'beforeAdd' } },
-  },
-  rules: {
-    list: null,
-    read: { isAuthenticated: true, equal: ['resource.data.userId', 'request.auth.uid'] },
-    update: { isAuthenticated: true, equal: ['resource.data.userId', 'request.auth.uid'] },
-    write: { isAuthenticated: true },
-    delete: null
-  },
-  hooks: {
-    removeAllUserData: { path: 'users/{userId}', on: 'delete' },
-    sendWelcomeEmail: { path: 'users/{userId}', on: 'create', functionName: 'otherFunction' }
   }
 })
 export class UsersCollection extends Collection {

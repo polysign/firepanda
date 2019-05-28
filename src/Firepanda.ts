@@ -16,23 +16,10 @@ interface FirepandaIdDefinition {
   from?: string;
 }
 
-interface FirepandaRuleDefinition {
-  isAuthenticated: Boolean;
-  equal?: string[];
-}
-
-interface FirepandaHook {
-  on: 'create' | 'write' | 'delete';
-  path: string;
-  functionName?: string;
-}
-
 interface FirepandaParams {
   name: string;
   id: FirepandaIdDefinition;
   schema: { [name: string]: FirepandaSchemaDefinition };
-  rules: { [name: string]: FirepandaRuleDefinition }
-  hooks?: { [name: string]: FirepandaHook };
 }
 
 interface TransformationFunction {

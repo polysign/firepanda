@@ -11,7 +11,8 @@
     "declaration": true,
     "esModuleInterop": true,
     "lib": ["es2015", "es2017", "dom"],
-    "module": "commonjs"
+    "module": "commonjs",
+    "rootDir": "./src"
   },
   "compileOnSave": true,
   "includes": [
