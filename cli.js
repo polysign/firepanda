@@ -26,7 +26,7 @@ const runCli = async () => {
 
   switch(cli.input[0]) {
     case 'init':
-      require(`${basePath}/src/cli/init.js`)();
+      await require(`${basePath}/src/cli/init.js`)();
       break;
     case 'build':
       await buildProject();

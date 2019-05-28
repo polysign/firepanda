@@ -39,10 +39,11 @@ const promptProjectDetails = async () => {
   }
 }
 
-
 const createProject = async (projectConfig) => {
   const projectBasePath = path.join(process.cwd(), projectConfig.path);
 
+  console.info('')
+  console.info(`Preparing new project structure at ${projectBasePath}`);
   mkdirp(projectBasePath, async (err) => {
     if (err) { throw(err); }
 
@@ -96,6 +97,8 @@ const createProject = async (projectConfig) => {
     `);
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson));
     await execa('npm', ['install', 'jest'], { cwd: projectBasePath });
+
+    console.info(`New project structure ready`);
   });
 }
 
