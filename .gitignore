@@ -5,5 +5,3 @@ firebase-debug.log
 firestore-debug.log
 debug.log
 *.log
-
-/test-project
