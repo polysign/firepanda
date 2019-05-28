@@ -45,11 +45,10 @@ const buildProject = async () => {
   const build = {
     firestore: require(`${basePath}/src/cli/build-collections.js`),
     functions: require(`${basePath}/src/cli/build-functions.js`),
-    frontend: require(`${basePath}/src/cli/build-frontend.js`),
     storage: require(`${basePath}/src/cli/build-storage.js`)
   };
 
-  if (cli.input[1] && ['frontend', 'firestore', 'storage', 'functions'].includes(cli.input[1])) {
+  if (cli.input[1] && ['firestore', 'storage', 'functions'].includes(cli.input[1])) {
     await build[cli.input[1]](projectConfig[cli.input[1]]);
   } else {
     await Promise.all(Object.keys(build).map(async (buildKey) => {

@@ -5,7 +5,11 @@
 [![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/npm/l/firepanda.svg?style=flat)](https://www.npmjs.com/package/firepanda)
 
-Firepanda is a ORM-like tool to simplify working with complex datasets in Firebase (especially Firestore). The main goal is to have a very ORM-like API, that simplifies and accelerates development using Firebase services. Firepanda implements various key solutions to help improve working with Firebase (and potentially Google Cloud) services, including Firestore, Auth and other services.
+Firepanda is a development framework for Firebase and the Google Cloud (a few selected services are supported). The main goal of Firepanda is to simplify and accelerate the development of backend services powered by Firebase (Firestore, Authentication, Storage, ...), and some selected Google Cloud services.
+
+### CLI
+
+Firepanda comes with a small CLI to handle the project structure and build the necessary files in order to deploy to Firebase and other Google Cloud services.
 
 ## Installation
 
@@ -25,7 +29,7 @@ import * as firebase from 'firebase';
 firebase.initializeApp({... your credentials});
 ```
 
-### Define models
+### Define schema/collection
 ```typescript
 import { Collection, Repository } from 'firepanda';
 
