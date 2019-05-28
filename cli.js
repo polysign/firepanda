@@ -1,16 +1,14 @@
 #!/usr/bin/env node
 'use strict';
 
-const execa = require('execa');
 const meow = require('meow');
 const path = require('path');
 const fs = require('fs-extra');
-const mkdirp = require('mkdirp');
-const { prompt } = require('enquirer');
+const ora = require('ora');
 
 const cli = meow(`
   Usage
-    $ firepanda init
+    $ firepanda init <project-name> <path>
     $ firepanda build
     $ firepanda deploy
 `)
@@ -21,12 +19,20 @@ if (cli.input.length === 0) {
 }
 
 const runCli = async () => {
-  showBanner();
   const basePath = getBasePath();
+
+  const spinner = ora({
+    color: 'yellow',
+    prefixText: '> Firepanda'
+  });
 
   switch(cli.input[0]) {
     case 'init':
-      await require(`${basePath}/src/cli/init.js`)();
+      if (cli.input[1] && cli.input[2]) {
+        await require(`${basePath}/src/cli/init.js`)(spinner, basePath, cli.input[1], cli.input[2]);
+      } else {
+        throw new Error('Project name and path are missing')
+      }
       break;
     case 'build':
       await buildProject();
@@ -35,7 +41,8 @@ const runCli = async () => {
       buildProject();
       break;
   }
-  showOutro();
+
+  spinner.stopAndPersist({ text: 'Done', symbol: '-' });
 }
 
 const buildProject = async () => {
@@ -84,14 +91,9 @@ const getBasePath = () => {
   } 
 }
 
-const showBanner = () => {
-  console.info('');
-  console.info('Firepanda CLI');
-  console.info('-------------');
-}
-
-const showOutro = () => {
-  console.info('');
+const showBanner = (command) => {
+  console.info('>');
+  console.info(`> Firepanda CLI [${command}]`);
 }
 
 runCli();

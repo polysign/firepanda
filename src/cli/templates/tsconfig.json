@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "outDir": "lib",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "noImplicitReturns": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "moduleResolution": "node",
+    "declaration": true,
+    "esModuleInterop": true,
+    "lib": ["es2015", "es2017", "dom"],
+    "module": "commonjs"
+  },
+  "compileOnSave": true,
+  "includes": [
+    "src"
+  ],
+  "exclude": [
+    "src/tests",
+    "src/**/*.test.ts",
+    "node_modules"
+  ]
+}
