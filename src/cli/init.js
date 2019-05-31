@@ -30,6 +30,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
 
       packageJson.scripts = {
         'test': 'jest',
+        'prebuild': 'tsc',
         'build': 'firepanda build',
         'build:firestore': 'firepanda build firestore',
         'build:functions': 'firepanda build functions',
@@ -43,7 +44,8 @@ const createProject = async (spinner, basePath, projectConfig) => {
       packageJson.firepanda = {
         firestore: {
           source: 'src/collections',
-          output: 'lib/collections'
+          output: 'lib/collections',
+          rulesTargetFile: 'lib/collections/firestore.rules'
         },
         functions: {
           source: 'src/functions',
@@ -53,9 +55,32 @@ const createProject = async (spinner, basePath, projectConfig) => {
           source: 'src/buckets'
         }
       };
-      
+
+      // Collections
       mkdirp(path.join(projectBasePath, 'src/collections'));
+      mkdirp(path.join(projectBasePath, 'src/collections/rules'));
+      fs.createFileSync(path.join(projectBasePath, 'src/collections/rules', 'sample.rules'));
+      fs.writeFileSync(path.join(projectBasePath, 'src/collections/rules', 'sample.rules'), `
+match /users/{userId} {
+  allow read: if request.auth != null;
+}
+`)
+
+      // Functions
       mkdirp(path.join(projectBasePath, 'src/functions'));
+      mkdirp(path.join(projectBasePath, 'src/functions/http'));
+      mkdirp(path.join(projectBasePath, 'src/functions/pubsub'));
+      mkdirp(path.join(projectBasePath, 'src/functions/firestore'));
+      mkdirp(path.join(projectBasePath, 'src/functions/storage'));
+
+      mkdirp(path.join(projectBasePath, 'src/functions/auth'));
+      fs.writeFileSync(path.join(projectBasePath, 'src/functions/auth', 'onCreate.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'authOnCreate.ts')));
+      fs.writeFileSync(path.join(projectBasePath, 'src/functions/auth', 'onDelete.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'authOnDelete.ts')));
+      
+      mkdirp(path.join(projectBasePath, 'src/functions/config'));
+      fs.writeFileSync(path.join(projectBasePath, 'src/functions/config', 'onUpdate.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'configOnUpdate.ts')));
+
+      // Storage
       mkdirp(path.join(projectBasePath, 'src/buckets'));
 
       fs.writeFileSync(path.join(projectBasePath, '.gitignore'), `
