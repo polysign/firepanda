@@ -17,15 +17,17 @@ const createProject = async (spinner, basePath, projectConfig) => {
   const packageJsonPath = path.join(projectBasePath, 'package.json');
   
   spinner.start();
-  spinner.text = 'Preparing project';
+  spinner.text = 'Preparing project... ';
   return new Promise(async (resolve) => {
     await mkdirp(projectBasePath)
     
-    spinner.text = 'Initialising new npm package';
+    spinner.text = 'Initialising new npm package... ';
     await execa('npm', ['init', '-y'], { cwd: projectBasePath });
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath));
     packageJson.name = String(projectConfig.name).toLowerCase().split(' ').join('-');
 
+    packageJson.engines = { node: '8' };
+    packageJson.main = 'lib/index.js';
     packageJson.scripts = {
       'test': 'jest',
       'prebuild': 'tsc',
@@ -37,7 +39,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
       'deploy:firestore': 'firepanda deploy firestore',
       'deploy:functions': 'firepanda deploy functions',
       'deploy:storage': 'firepanda deploy storage',
-    }
+    };
 
     packageJson.firepanda = {
       firestore: {
@@ -75,6 +77,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
     fs.writeFileSync(path.join(projectSourcePath, 'collections/rules', 'sample.rules'), fs.readFileSync(path.join(basePath, 'src/cli/templates/firestore', 'rules.sample')));
     fs.writeFileSync(path.join(projectSourcePath, 'buckets/rules', 'sample.rules'), fs.readFileSync(path.join(basePath, 'src/cli/templates/storage', 'rules.sample')));
 
+    fs.writeFileSync(path.join(projectSourcePath, 'index.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'index.ts')));
     fs.writeFileSync(path.join(projectSourcePath, 'functions/auth', 'onCreate.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'authOnCreate.ts')));
     fs.writeFileSync(path.join(projectSourcePath, 'functions/auth', 'onDelete.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'authOnDelete.ts')));    
     fs.writeFileSync(path.join(projectSourcePath, 'functions/config', 'onUpdate.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'configOnUpdate.ts')));
@@ -86,7 +89,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
     `);
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson));
 
-    spinner.text = 'Installing dependencies';
+    spinner.text = 'Installing dependencies... ';
     const dependencies = [
       'jest', 'typescript', 'ts-jest', 'camelcase', 'glob',
       'firebase', 'firebase-admin', 'firebase-functions',
@@ -95,7 +98,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
     ];
     await execa('npm', ['install'].concat(dependencies), { cwd: projectBasePath });
 
-    spinner.text = 'Setup Typescript';
+    spinner.text = 'Setup Typescript... ';
     const tsConfigSourcePath = path.join(basePath, 'src/cli/templates', 'tsconfig.json');
     const tsConfigTargetPath = path.join(projectBasePath, 'tsconfig.json');
     fs.copyFileSync(tsConfigSourcePath, tsConfigTargetPath)

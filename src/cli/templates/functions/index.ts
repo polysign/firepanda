@@ -1,26 +1,30 @@
 import { glob } from 'glob';
-import * as camelCase from 'camelcase';
+import camelcase from 'camelcase';
+import * as path from 'path';
 import * as functions from 'firebase-functions';
 
-const files = glob.sync('./src/functions/**/*.f.js', { cwd: __dirname, ignore: './node_modules/**'});
+const files = glob.sync('**/*.f.js', { cwd: __dirname, ignore: './node_modules/**'});
 
 for(let i = 0, filesLength = files.length; i < filesLength; i++){
   const file = files[i];
+  const filePath = path.join(__dirname, file);
 
   const filePathItems = file.slice(0, -5).split('functions').pop().split('/').filter(Boolean);
-  const functionName = [filePathItems[0], camelCase(filePathItems.slice(1).join('_'))].join('_');
+  const functionName = [filePathItems[0], camelcase(filePathItems.slice(1).join('_'))].join('_');
 
-  const requiredDependencies = require(file).dependencies;
+  const requiredDependencies = require(filePath).dependencies;
   const dependencies = {};
-  requiredDependencies.forEach((dependencyName: string) => {
-    dependencies[dependencyName] = require(`${dependencyName}`);
-  });
+  if (requiredDependencies) {
+    requiredDependencies.forEach((dependencyName: string) => {
+      dependencies[dependencyName] = require(`${dependencyName}`);
+    });
+  }
 
   if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === functionName) {
-    const exportedFunction = require(file).func;
+    const exportedFunction = require(filePath).main;
     let func = null;
 
-    switch(functionName.split('_').pop()) {
+    switch(functionName.split('_')[0]) {
       case 'http':
         func = functions.https.onCall((data, context) => {
           exportedFunction(data, context, requiredDependencies)
@@ -41,7 +45,7 @@ for(let i = 0, filesLength = files.length; i < filesLength; i++){
         };
         break;
       case 'firestore':
-        const collectionPath = require(file).collectionPath;
+        const collectionPath = require(filePath).collectionPath;
         switch(filePathItems.pop()) {
           case 'onWrite':
             func = functions.firestore.document(`${collectionPath}`).onWrite((change, context) => {
@@ -49,8 +53,8 @@ for(let i = 0, filesLength = files.length; i < filesLength; i++){
             });
             break;
           case 'onCreate':
-            func = functions.firestore.document(`${collectionPath}`).onCreate((change, context) => {
-              exportedFunction(change, context, requiredDependencies);
+            func = functions.firestore.document(`${collectionPath}`).onCreate((snap, context) => {
+              exportedFunction(snap, context, requiredDependencies);
             });
             break;
           case 'onUpdate':
