@@ -9,9 +9,8 @@ before_install:
   - npm install
 script:
   - npm install -g firebase-tools
-  - firebase login --token "$FIREBASE_TOKEN"
-  - firebase setup:emulators:firestore --debug
-  - npm run test:firestore:emulator
+  - firebase setup:emulators:firestore --debug --token "$FIREBASE_TOKEN"
+  - firebase emulators:start --only firestore --token "$FIREBASE_TOKEN"
   - npm run test:jest
 git:
   depth: false
