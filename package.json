@@ -45,5 +45,13 @@
     "type": "git",
     "url": "git@polysign.github.com:polysign/firepanda.git"
   },
-  "keywords": []
+  "keywords": [
+    "firebase",
+    "firestore",
+    "google-cloud",
+    "cloud functions",
+    "serverless",
+    "typescript",
+    "framework"
+  ]
 }
