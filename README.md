@@ -1,6 +1,6 @@
 # Firepanda 🔥🐼
 
-[![Build Status](https://travis-ci.com/wovalle/firepanda.svg?token=KsyisFHzgCusk2sapuJe&branch=master)](https://travis-ci.com/polysign/firepanda)
+[![Build Status](https://api.travis-ci.org/polysign/firepanda.svg?branch=master)](https://travis-ci.com/polysign/firepanda)
 [![NPM Version](https://img.shields.io/npm/v/firepanda.svg?style=flat)](https://www.npmjs.com/package/firepanda)
 [![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/npm/l/firepanda.svg?style=flat)](https://www.npmjs.com/package/firepanda)
