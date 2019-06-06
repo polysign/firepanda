@@ -10,7 +10,7 @@ before_install:
 script:
   - npm install -g firebase-tools
   - firebase setup:emulators:firestore --debug
-  - npm run test:firestore:emulator &&
+  - npm run test:firestore:emulator
   - npm run test:jest
 git:
   depth: false
