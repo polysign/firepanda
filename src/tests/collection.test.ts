@@ -18,6 +18,10 @@ beforeEach(async () => {
   }));
 });
 
+afterAll(() => {
+  firebaseApp.delete();
+});
+
 describe('Collections > Get', () => {
   describe('Get document which does not exist yet', () => {
     test('it should return null', async () => {
@@ -249,7 +253,6 @@ describe('Collections > query', () => {
     test('it should return documents', async () => {
       // Given
       const res = await Users.add({ name: 'Georges', height: 168 });
-      console.log(res)
       await Users.add({ name: 'Laurent', height: 197 });
       await Users.add({ name: 'Isabelle', height: 162 });
 
