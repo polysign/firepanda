@@ -1,4 +1,6 @@
-export const main = (change: any, context: any) => {
-  console.log('Change', change);
+export const collectionPath = 'users/{userId}';
+
+export const main = (snap: any, context: any, { firestore }) => {
+  console.log('Snap', snap);
   console.log('Context', context);
-}
+};

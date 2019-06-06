@@ -67,6 +67,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
       path.join(projectSourcePath, 'functions', 'firestore'),
       path.join(projectSourcePath, 'functions', 'storage'),
       path.join(projectSourcePath, 'functions', 'config'),
+      path.join(projectSourcePath, 'functions', 'services'),
       path.join(projectSourcePath, 'buckets'),
       path.join(projectSourcePath, 'buckets', 'rules'),
     ].map(async (pathToCreate) => {
@@ -77,10 +78,17 @@ const createProject = async (spinner, basePath, projectConfig) => {
     fs.writeFileSync(path.join(projectSourcePath, 'collections/rules', 'sample.rules'), fs.readFileSync(path.join(basePath, 'src/cli/templates/firestore', 'rules.sample')));
     fs.writeFileSync(path.join(projectSourcePath, 'buckets/rules', 'sample.rules'), fs.readFileSync(path.join(basePath, 'src/cli/templates/storage', 'rules.sample')));
 
+    // Setup functions
     fs.writeFileSync(path.join(projectSourcePath, 'index.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'index.ts')));
     fs.writeFileSync(path.join(projectSourcePath, 'functions/auth', 'onCreate.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'authOnCreate.ts')));
     fs.writeFileSync(path.join(projectSourcePath, 'functions/auth', 'onDelete.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'authOnDelete.ts')));    
     fs.writeFileSync(path.join(projectSourcePath, 'functions/config', 'onUpdate.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'configOnUpdate.ts')));
+
+    // Setup functions/services
+    fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'firestore.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'firestore.ts')));
+    fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'storage.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'storage.ts')));
+    fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'pubsub.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'pubsub.ts')));
+    fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'bigquery.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'bigquery.ts')));
 
     fs.writeFileSync(path.join(projectBasePath, '.gitignore'), `
       /lib

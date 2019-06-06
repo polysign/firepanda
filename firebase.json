@@ -4,8 +4,8 @@
     "indexes": "./firebase/firestore.indexes.json"
   },
   "functions": {
-    "predeploy": "npm --prefix run build",
-    "source": "./src/functions"
+    "predeploy": "npm --prefix test/113 run build",
+    "source": "./test/113"
   },
   "hosting": {
     "public": "./dist",
