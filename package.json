@@ -7,9 +7,10 @@
     "cli:firepanda": "node bin/firepanda",
     "cli": "npm-run-all -l cli:*",
     "test:jest": "jest",
+    "test:jest:ci": "jest --ci --runInBand",
     "test:jest:watch": "jest --watch",
     "test:firestore:emulator": "firebase emulators:start --only firestore",
-    "ci": "start-server-and-test test:firestore:emulator http-get://127.0.0.1:8080 test:jest"
+    "ci": "start-server-and-test test:firestore:emulator http-get://127.0.0.1:8080 test:jest:ci"
   },
   "author": "Georges Jentgen <georges@polysign.lu>",
   "license": "ISC",
