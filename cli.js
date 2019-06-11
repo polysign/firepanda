@@ -29,8 +29,6 @@ const runCli = async () => {
     prefixText: '> Firepanda'
   });
 
-  console.log(cli.input[0]);
-
   switch(cli.input[0]) {
     case 'init':
       if (cli.input[1] && cli.input[2]) {

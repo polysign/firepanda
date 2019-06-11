@@ -5,23 +5,26 @@ node_js:
 - 11.15.0
 cache: npm
 install: npm install -g firebase-tools
+before_script:
+  - npm run build
 before_install:
-- npm install
+  - npm install
 script:
-- npm install -g firebase-tools
-- firebase setup:emulators:firestore --debug --token "$FIREBASE_TOKEN"
-- npm run ci
+  - npm install -g firebase-tools
+  - firebase setup:emulators:firestore --debug --token "$FIREBASE_TOKEN"
+  - npm run ci
 git:
   depth: false
   quiet: true
 branches:
   only:
-  - master
-  - develop
+    - master
+    - develop
 deploy:
-  provider: npm
-  email: georges@polysign.lu
-  api_key:
-    secure: epkoPP4f/uEA6F61R8EvPtcWgpZ/+EPsAzuOp1w2drBS1osnwZUj5bNfclgv5X/k/mkvDpWTzy4T7sBJd5Em4LO4FfducBQLN3vmAaIJV/6Ss/huWMDyu5Mn6iA5ZNWyP5yHJBXmxffsPtGt6XZfTPrFMoRcaonKtAAL7nUddsxeoaexig1osmH9pw8Zn97/s2cGt2/GSuwbsAz/YMHQzlcSQjKRTZ5LA3+2vl/5FOrFa/N0IqqZSkXVPlIVIVkgR8txJkpM+u8hD+oMGARRbOjxSj4t81C8DGk0il9GIyEh8mxqz0v9BZZa4+iKkapABufcrFKZm52QEeQ28BTRm2auYTcHkcKRqP79FoJ9rZ5V9rWTbFRnXatBBxg0fkXqv6yscGjYUWn3EiZ1AvYljROxPPKt7X1M+uXNgMM81EWHw6/cNABpFEHfKJ7iPbZyjHw8ZocWp0CKGeNtphOjrG5VR7Onjt9Cej1q/B0yne7sMx+OWg89UqWQqW0Z3s9BQRukiZqZ//F2rW80s6+2eRgCEiILERJECJWweIef2a6CGCspYFG2uwgV8jvwwyZCO0bmc0cKv0vfvJMG1Vu4Q4VGUki+9gIJv04etYUzRTbxEWvbyzic+4d3XfAVv56ICTfULXRE9Vf4vg13fMz/shuVlsQ3ecnxOtqWSTrXQis=
-  on:
-    branch: master
+  - provider: npm
+    skip_cleanup: true
+    email: georges@polysign.lu
+    api_key:
+      secure: epkoPP4f/uEA6F61R8EvPtcWgpZ/+EPsAzuOp1w2drBS1osnwZUj5bNfclgv5X/k/mkvDpWTzy4T7sBJd5Em4LO4FfducBQLN3vmAaIJV/6Ss/huWMDyu5Mn6iA5ZNWyP5yHJBXmxffsPtGt6XZfTPrFMoRcaonKtAAL7nUddsxeoaexig1osmH9pw8Zn97/s2cGt2/GSuwbsAz/YMHQzlcSQjKRTZ5LA3+2vl/5FOrFa/N0IqqZSkXVPlIVIVkgR8txJkpM+u8hD+oMGARRbOjxSj4t81C8DGk0il9GIyEh8mxqz0v9BZZa4+iKkapABufcrFKZm52QEeQ28BTRm2auYTcHkcKRqP79FoJ9rZ5V9rWTbFRnXatBBxg0fkXqv6yscGjYUWn3EiZ1AvYljROxPPKt7X1M+uXNgMM81EWHw6/cNABpFEHfKJ7iPbZyjHw8ZocWp0CKGeNtphOjrG5VR7Onjt9Cej1q/B0yne7sMx+OWg89UqWQqW0Z3s9BQRukiZqZ//F2rW80s6+2eRgCEiILERJECJWweIef2a6CGCspYFG2uwgV8jvwwyZCO0bmc0cKv0vfvJMG1Vu4Q4VGUki+9gIJv04etYUzRTbxEWvbyzic+4d3XfAVv56ICTfULXRE9Vf4vg13fMz/shuVlsQ3ecnxOtqWSTrXQis=
+    on:
+      branch: master
