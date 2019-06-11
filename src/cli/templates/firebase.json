@@ -1,11 +1,11 @@
 {
   "firestore": {
-    "rules": "firestore.rules",
+    "rules": "./lib/firestore.rules",
     "indexes": "firestore.indexes.json"
   },
   "functions": {
-    "predeploy": "npm --prefix test/113 run build",
-    "source": "./test/113"
+    "predeploy": "npm --prefix run build",
+    "source": "."
   },
   "hosting": {
     "public": "./dist",

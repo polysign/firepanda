@@ -85,7 +85,6 @@ const createProject = async (spinner, basePath, projectConfig) => {
     fs.writeFileSync(path.join(projectSourcePath, 'functions/config', 'onUpdate.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'configOnUpdate.ts')));
 
     // Setup functions/services
-    fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'firestore.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'firestore.ts')));
     fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'storage.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'storage.ts')));
     fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'pubsub.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'pubsub.ts')));
     fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'bigquery.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'bigquery.ts')));
@@ -99,7 +98,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
 
     spinner.text = 'Installing dependencies... ';
     const dependencies = [
-      'jest', 'typescript', 'ts-jest', 'camelcase', 'glob',
+      'firepanda', 'jest', 'typescript', 'ts-jest', 'camelcase', 'glob',
       'firebase', 'firebase-admin', 'firebase-functions',
       '@google-cloud/pubsub', '@google-cloud/storage', '@google-cloud/bigquery',
       '@google-cloud/scheduler', 
@@ -110,6 +109,9 @@ const createProject = async (spinner, basePath, projectConfig) => {
     const tsConfigSourcePath = path.join(basePath, 'src/cli/templates', 'tsconfig.json');
     const tsConfigTargetPath = path.join(projectBasePath, 'tsconfig.json');
     fs.copyFileSync(tsConfigSourcePath, tsConfigTargetPath)
+
+    // Setup Firebase project
+    // await execa('firebase', ['init'].concat(dependencies), { cwd: projectBasePath });
 
     resolve();
   });

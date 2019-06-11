@@ -9,9 +9,12 @@ const ora = require('ora');
 const cli = meow(`
   Usage
     $ firepanda init <project-name> <path>
-    $ firepanda build
-    $ firepanda deploy
+    $ firepanda -v
 `)
+
+if (cli.flags.v && cli.flags.v === true) {
+  cli.showVersion();
+}
 
 if (cli.input.length === 0) {
   console.error('Missing: command')

@@ -4,6 +4,7 @@
   "description": "A Firestore ORM built using Typescript",
   "main": "lib/index.js",
   "scripts": {
+    "build": "tsc",
     "cli:firepanda": "node bin/firepanda",
     "cli": "npm-run-all -l cli:*",
     "test:jest": "jest",
