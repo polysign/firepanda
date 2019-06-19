@@ -135,7 +135,7 @@ export function Firepanda(params: FirepandaParams) {
                   }
 
                   if (latitude && longitude) {
-                    data[objectKey] = new firebaseAdmin.firestore.GeoPoint(latitude, longitude);
+                    data[objectKey] = new firebase.firestore.GeoPoint(latitude, longitude);
                   } else {
                     throw new Error('Unable to create geopoint')
                   }
@@ -155,7 +155,7 @@ export function Firepanda(params: FirepandaParams) {
       async __applyFieldTransform(fieldValue: any, schemaType: string): Promise<any> {
         switch(schemaType) {
           case 'timestamp':
-            return firebaseAdmin.firestore.Timestamp.now();
+            return firebase.firestore.Timestamp.now();
         }
 
         return fieldValue;
