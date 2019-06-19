@@ -1,4 +1,5 @@
-import * as firebase from 'firebase-admin';
+import * as firebaseAdmin from 'firebase-admin';
+import * as firebase from 'firebase';
 import { Query, WhereClause } from './Query';
 
 type DataEventTypes = 'beforeAdd' | 'afterAdd' | 'beforeUpdate' | 'afterUpdate' | 'beforeDelete' | 'afterDelete';
@@ -30,11 +31,11 @@ interface TransformationFunction {
 export function Firepanda(params: FirepandaParams) {
   return function<T extends {new(...args:any[]):{}}>(constructor: T) {
     return class extends constructor {
-      firebaseApp: firebase.app.App;
+      firebaseApp: firebaseAdmin.app.App;
       collectionName: string = params.name;
       collectionIdDefinition: FirepandaIdDefinition = params.id;
       collectionSchema: any = params.schema;
-      collectionRef: firebase.firestore.CollectionReference;
+      collectionRef: firebaseAdmin.firestore.CollectionReference;
 
       constructor(...args: any[]) {
         super();
@@ -123,7 +124,7 @@ export function Firepanda(params: FirepandaParams) {
                 data[objectKey] = Object.assign({}, data[objectKey]);
                 break;
               case 'geopoint':
-                if (data[objectKey].constructor !== firebase.firestore.GeoPoint) {
+                if (data[objectKey].constructor !== firebaseAdmin.firestore.GeoPoint) {
                   let latitude = 0;
                   let longitude = 0;
                   if (data[objectKey].latitude || data[objectKey].lat) {
@@ -134,7 +135,7 @@ export function Firepanda(params: FirepandaParams) {
                   }
 
                   if (latitude && longitude) {
-                    data[objectKey] = new firebase.firestore.GeoPoint(latitude, longitude);
+                    data[objectKey] = new firebaseAdmin.firestore.GeoPoint(latitude, longitude);
                   } else {
                     throw new Error('Unable to create geopoint')
                   }
@@ -154,7 +155,7 @@ export function Firepanda(params: FirepandaParams) {
       async __applyFieldTransform(fieldValue: any, schemaType: string): Promise<any> {
         switch(schemaType) {
           case 'timestamp':
-            return firebase.firestore.Timestamp.now();
+            return firebaseAdmin.firestore.Timestamp.now();
         }
 
         return fieldValue;
@@ -199,11 +200,11 @@ export function Firepanda(params: FirepandaParams) {
         return data;
       }
       
-      async __afterAddHook(docRef: firebase.firestore.DocumentReference, data: any): Promise<any> {
+      async __afterAddHook(docRef: firebaseAdmin.firestore.DocumentReference, data: any): Promise<any> {
         return data;
       }
 
-      async __beforeUpdateHook(docRef: firebase.firestore.DocumentReference, data: any): Promise<any>  {
+      async __beforeUpdateHook(docRef: firebaseAdmin.firestore.DocumentReference, data: any): Promise<any>  {
         // console.log('beforeSaveHook');
         // Object.keys(this.collectionSchema).forEach((key) => {
         //   if (this.collectionSchema[key].transform) {
@@ -212,15 +213,15 @@ export function Firepanda(params: FirepandaParams) {
         // })
       }
       
-      async __afterUpdateHook(docRef: firebase.firestore.DocumentReference, data: any): Promise<any>  {
+      async __afterUpdateHook(docRef: firebaseAdmin.firestore.DocumentReference, data: any): Promise<any>  {
         // console.log('afterSaveHook');
       }
       
-      async __beforeDeleteHook(docRef: firebase.firestore.DocumentReference): Promise<any> {
+      async __beforeDeleteHook(docRef: firebaseAdmin.firestore.DocumentReference): Promise<any> {
         // console.log('beforeDeleteHook');
       }
 
-      async __afterDeleteHook(docRef: firebase.firestore.DocumentReference): Promise<any> {
+      async __afterDeleteHook(docRef: firebaseAdmin.firestore.DocumentReference): Promise<any> {
         // console.log('afterDeleteHook');
       }
       
@@ -236,8 +237,8 @@ export function Firepanda(params: FirepandaParams) {
       }
 
       async getAll(): Promise<any[]> {
-        const querySnapshot: firebase.firestore.QuerySnapshot = await this.collectionRef.get();
-        const items: any[] = querySnapshot.docs.map((doc: firebase.firestore.QueryDocumentSnapshot) => {
+        const querySnapshot: firebaseAdmin.firestore.QuerySnapshot = await this.collectionRef.get();
+        const items: any[] = querySnapshot.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => {
           return Object.assign(doc.data(), {_id: doc.id});
         });
 
@@ -269,7 +270,7 @@ export function Firepanda(params: FirepandaParams) {
         const [ docId, docData ] = await this.__handleIdField(
           Object.assign({}, await this.__handleTransform(data, 'beforeAdd')
         ), documentId);
-        let docRef: firebase.firestore.DocumentReference;
+        let docRef: firebaseAdmin.firestore.DocumentReference;
 
         if (docId) {
           const existingDoc = await this.get(docId);
@@ -306,7 +307,7 @@ export function Firepanda(params: FirepandaParams) {
       }
 
       async query(query: Query): Promise<any[]> {
-        let collectionQuery: firebase.firestore.Query = this.collectionRef;
+        let collectionQuery: firebaseAdmin.firestore.Query = this.collectionRef;
 
         if (Object.keys(query).length === 0) {
           throw new Error('Query object missing');
@@ -332,7 +333,7 @@ export function Firepanda(params: FirepandaParams) {
         }
 
         const querySnapshot = await collectionQuery.get();
-        const documents = querySnapshot.docs.map((docSnapshot: firebase.firestore.QueryDocumentSnapshot) => {
+        const documents = querySnapshot.docs.map((docSnapshot: firebaseAdmin.firestore.QueryDocumentSnapshot) => {
           return docSnapshot.data();
         });
         
