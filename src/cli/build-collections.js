@@ -20,10 +20,12 @@ service cloud.firestore {
   }
 }`;
 
+console.log('here');
+
   fs.writeFileSync(rulesTargetFilePath, rulesStart);
 
   // Read rules files
-  fs.readdirSync(path.join(process.cwd(), config.source)).filter((fileName) => {
+  fs.readdirSync(path.join(process.cwd(), config.source, 'rules')).filter((fileName) => {
     return fileName.endsWith('.rules');
   }).forEach(async (fileName) => {
     const rules = fs.readFileSync(path.join(process.cwd(), config.source, fileName));
