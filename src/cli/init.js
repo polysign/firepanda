@@ -76,6 +76,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
 
     fs.createFileSync(path.join(projectSourcePath, 'collections/rules', 'sample.rules'));
     fs.writeFileSync(path.join(projectSourcePath, 'collections/rules', 'sample.rules'), fs.readFileSync(path.join(basePath, 'src/cli/templates/firestore', 'rules.sample')));
+    fs.writeFileSync(path.join(projectSourcePath, 'collections/', 'Users.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/firestore', 'collection.sample.ts')));
     fs.writeFileSync(path.join(projectSourcePath, 'buckets/rules', 'sample.rules'), fs.readFileSync(path.join(basePath, 'src/cli/templates/storage', 'rules.sample')));
 
     // Setup functions
@@ -98,7 +99,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
 
     spinner.text = 'Installing dependencies... ';
     const dependencies = [
-      'firepanda', 'jest', 'typescript', 'ts-jest', 'camelcase', 'glob',
+      'jest', 'typescript', 'ts-jest', 'camelcase', 'glob',
       'firebase', 'firebase-admin', 'firebase-functions',
       '@google-cloud/pubsub', '@google-cloud/storage', '@google-cloud/bigquery',
       '@google-cloud/scheduler', 
@@ -106,12 +107,15 @@ const createProject = async (spinner, basePath, projectConfig) => {
     await execa('npm', ['install'].concat(dependencies), { cwd: projectBasePath });
 
     spinner.text = 'Setup Typescript... ';
-    const tsConfigSourcePath = path.join(basePath, 'src/cli/templates', 'tsconfig.json');
+    const tsConfigSourcePath = path.join(basePath, 'src/cli/templates', 'tsconfig.template.json');
     const tsConfigTargetPath = path.join(projectBasePath, 'tsconfig.json');
     fs.copyFileSync(tsConfigSourcePath, tsConfigTargetPath)
-
+    
     // Setup Firebase project
-    // await execa('firebase', ['init'].concat(dependencies), { cwd: projectBasePath });
+    spinner.text = 'Setup Firebase... ';
+    const firebaseConfigSourcePath = path.join(basePath, 'src/cli/templates', 'firebase.template.json');
+    const firebaseConfigTargetPath = path.join(projectBasePath, 'firebase.json');
+    fs.copyFileSync(firebaseConfigSourcePath, firebaseConfigTargetPath)
 
     resolve();
   });

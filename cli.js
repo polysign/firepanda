@@ -37,6 +37,14 @@ const runCli = async () => {
         throw new Error('Project name and path are missing')
       }
       break;
+    case 'build':
+      if (cli.input[1]) {
+          
+      } else {
+          
+      
+      }
+      break;
   }
 
   spinner.stopAndPersist({ text: 'Done', symbol: '-' });

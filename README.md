@@ -5,7 +5,7 @@
 [![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/npm/l/firepanda.svg?style=flat)](https://www.npmjs.com/package/firepanda)
 
-Firepanda is a development framework for Firebase and the Google Cloud (a few selected services are supported). The main goal of Firepanda is to simplify and accelerate the development of backend services powered by Firebase (Firestore, Authentication, Storage, ...), and some selected Google Cloud services.
+Firepanda is a development framework for Firebase and the Google Cloud (a few selected services are supported). The main goal of Firepanda is to simplify and accelerate the development of applications powered by Firebase (Firestore, Authentication, Storage, ...), and some selected Google Cloud services.
 
 ### CLI
 
@@ -19,48 +19,20 @@ npm install firepanda
 
 ## Usage
 
-First, make sure you have a Firebase app setup and initialized. [Follow this guide](https://firebase.google.com/docs/firestore/quickstart#initialize) if you are new to Firebase.
-
-### Setup
-
-```typescript
-import * as firebase from 'firebase';
-
-firebase.initializeApp({... your credentials});
+```bash
+firepanda init my-project folder-name
 ```
 
-### Define schema/collection
-```typescript
-import { Collection, Repository } from 'firepanda';
+This will generate a new folder structure, install all required base dependencies and copy all files to start developing a new application.
 
-@Collection({
-  name: 'posts',
-  schema: {
-    publicationDate: { type: 'datetime', default: Date.now, mutable: false },
-    title: { type: 'string', required: true },
-    content: { type: 'string', required: true },
-    comments: { type: 'collection', schema: {
-      date: { type: 'datetime', default: Date.now }
-      author: { type: 'string' },
-      comment: { type: 'string' },
-      approved: { type: 'boolean', default: false }
-    }}
-  }
-});
-class Post extends Repository {
-  // Implement your custom model logic here
-  //
-  // - Supports event hooks (before/after save, update, delete, ...)
-  // - Access to low level features, expose observable data, ...
+## Setup
 
-  async addComment(author, comment) {
-    // Access to sub-collection
-    this.data.comments.add({
-      author: author,
-      comment: comment
-    })
-  }
-}
+Setup firebase in your new project folder
+
+```bash
+firebase login
+OR
+firebase use
 ```
 
-## Documentation
+### 
