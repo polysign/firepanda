@@ -2,7 +2,6 @@ import * as firebase from 'firebase';
 import { setupFirebase } from './helpers/firebaseHelper';
 
 import { UsersCollection } from './collections/Users';
-import { WhereClause } from '../Query';
 
 let firebaseApp: firebase.app.App;
 let Users: UsersCollection;
@@ -19,8 +18,8 @@ afterEach(async () => {
   }));
 });
 
-afterAll(() => {
-  firebaseApp.delete();
+afterAll(async () => {
+  await firebaseApp.delete();
 });
 
 describe('Schema > _id > transform', () => {

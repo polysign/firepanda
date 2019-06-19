@@ -18,8 +18,8 @@ beforeEach(async () => {
   }));
 });
 
-afterAll(() => {
-  firebaseApp.delete();
+afterAll(async () => {
+  await firebaseApp.delete();
 });
 
 describe('Collections > Get', () => {
