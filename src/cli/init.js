@@ -76,7 +76,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
 
     fs.createFileSync(path.join(projectSourcePath, 'collections/rules', 'sample.rules'));
     fs.writeFileSync(path.join(projectSourcePath, 'collections/rules', 'sample.rules'), fs.readFileSync(path.join(basePath, 'src/cli/templates/firestore', 'rules.sample')));
-    fs.writeFileSync(path.join(projectSourcePath, 'collections/', 'Users.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/firestore', 'collection.sample.ts')));
+    fs.writeFileSync(path.join(projectSourcePath, 'collections/', 'Users.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/firestore', 'collection.sample')));
     fs.writeFileSync(path.join(projectSourcePath, 'buckets/rules', 'sample.rules'), fs.readFileSync(path.join(basePath, 'src/cli/templates/storage', 'rules.sample')));
 
     // Setup functions
