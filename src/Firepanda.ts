@@ -1,4 +1,4 @@
-import * as firebase from 'firebase';
+import * as firebase from 'firebase-admin';
 import { Query, WhereClause } from './Query';
 
 type DataEventTypes = 'beforeAdd' | 'afterAdd' | 'beforeUpdate' | 'afterUpdate' | 'beforeDelete' | 'afterDelete';

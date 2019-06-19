@@ -1,0 +1,19 @@
+import { UsersCollection } from '../../../collections/Users';
+
+export const collectionPath = 'users/{userId}';
+
+export const main = async (snap, context, { collections }) => {
+  const usersCollection: UsersCollection = collections['UsersCollection'];
+  console.log({
+    snap,
+    context,
+    usersCollection
+  });
+
+  const allUsers = await usersCollection.getAll();
+  allUsers.forEach((userObject) => {
+    console.log({userObject});
+  });
+
+  return true;
+}

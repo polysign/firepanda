@@ -84,6 +84,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
     fs.writeFileSync(path.join(projectSourcePath, 'functions/auth', 'onCreate.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'authOnCreate.ts')));
     fs.writeFileSync(path.join(projectSourcePath, 'functions/auth', 'onDelete.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'authOnDelete.ts')));    
     fs.writeFileSync(path.join(projectSourcePath, 'functions/config', 'onUpdate.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'configOnUpdate.ts')));
+    fs.writeFileSync(path.join(projectSourcePath, 'functions/firestore/users', 'onCreate.f.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/functions', 'collection.onCreate.sample')));
 
     // Setup functions/services
     fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'storage.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'storage.ts')));
@@ -99,7 +100,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
 
     spinner.text = 'Installing dependencies... ';
     const dependencies = [
-      'jest', 'typescript', 'ts-jest', 'camelcase', 'glob',
+      'firepanda', 'jest', 'typescript', 'ts-jest', 'camelcase', 'glob',
       'firebase', 'firebase-admin', 'firebase-functions',
       '@google-cloud/pubsub', '@google-cloud/storage', '@google-cloud/bigquery',
       '@google-cloud/scheduler', 

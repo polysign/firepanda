@@ -5,17 +5,21 @@ import * as functions from 'firebase-functions';
 import * as FirebaseAdmin from 'firebase-admin';
 import * as Firebase from 'firebase'; 
 
+Firebase.initializeApp(functions.config().firebase);
+
 const injectables = {
   firebase: Firebase,
   functions: functions,
   collections: {}
 };
 
-const collectionFiles = Array.from(glob.sync('firestore/**/*.js', { cwd: __dirname, ignore: './node_modules/**'}));
+const collectionFiles = Array.from(glob.sync('collections/**/*.js', { cwd: __dirname, ignore: './node_modules/**'}));
 collectionFiles.forEach((collectionFile: string) => {
-  const collectionClass = require(collectionFile);
-  const collection = new collectionClass(Firebase.app());
-  injectables.collections[collectionFile] = collection;
+  const collectionClass = require(path.join(__dirname, collectionFile));;
+
+  Object.keys(collectionClass).forEach((collectionClassName) => {
+    injectables.collections[collectionClassName] = new collectionClass[collectionClassName](Firebase.app());
+  });
 });
 
 const files = glob.sync('**/*.f.js', { cwd: __dirname, ignore: './node_modules/**'});
@@ -26,7 +30,6 @@ for(let i = 0, filesLength = files.length; i < filesLength; i++){
 
   const filePathItems = file.slice(0, -5).split('functions').pop().split('/').filter(Boolean);
   const functionName = [filePathItems[0], camelcase(filePathItems.slice(1).join('_'))].join('_');
-
 
   if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === functionName) {
     const exportedFunction = require(filePath).main;
