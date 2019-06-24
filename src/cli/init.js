@@ -39,14 +39,12 @@ const createProject = async (spinner, basePath, projectConfig) => {
     packageJson.firepanda = {
       firestore: {
         source: 'src/collections',
-        output: 'lib/collections',
         rulesTargetFile: 'lib/collections/firestore.rules',
         indexesTargetFile: 'lib/collections/firestore.indexes.json'
       },
       storage: {
         source: 'src/storage',
-        output: 'lib/storage',
-        rulesTargetFile: 'lib/storage/storage.rules'
+        rulesTargetFile: 'lib/storage.rules'
       }
     };
 
@@ -54,6 +52,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
     await Promise.all([
       path.join(projectSourcePath, 'collections'),
       path.join(projectSourcePath, 'collections', 'rules'),
+      path.join(projectSourcePath, 'collections', 'indexes'),
       path.join(projectSourcePath, 'functions'),
       path.join(projectSourcePath, 'functions', 'auth'),
       path.join(projectSourcePath, 'functions', 'http'),
