@@ -1,7 +1,7 @@
 {
   "firestore": {
-    "rules": "./lib/firestore.rules",
-    "indexes": "./lib/firestore.indexes.json"
+    "rules": "./lib/collections/firestore.rules",
+    "indexes": "./lib/collections/firestore.indexes.json"
   },
   "functions": {
     "predeploy": "npm run build",
@@ -22,7 +22,7 @@
     ]
   },
   "storage": {
-    "rules": "./lib/storage.rules"
+    "rules": "./lib/buckets/storage.rules"
   },
   "emulators": {
     "firestore": {

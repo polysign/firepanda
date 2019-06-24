@@ -32,6 +32,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
       'test': 'jest',
       'prebuild': 'tsc',
       'build': 'firepanda build',
+      'predeploy': 'npm run build',
       'deploy': 'firebase deploy',
     };
 
@@ -39,7 +40,13 @@ const createProject = async (spinner, basePath, projectConfig) => {
       firestore: {
         source: 'src/collections',
         output: 'lib/collections',
-        rulesTargetFile: 'lib/collections/firestore.rules'
+        rulesTargetFile: 'lib/collections/firestore.rules',
+        indexesTargetFile: 'lib/collections/firestore.indexes.json'
+      },
+      storage: {
+        source: 'src/storage',
+        output: 'lib/storage',
+        rulesTargetFile: 'lib/storage/storage.rules'
       }
     };
 
