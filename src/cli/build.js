@@ -3,8 +3,9 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-const run = async (config) => {
-  const rulesTargetFilePath = path.join(process.cwd(), config.rulesTargetFile);
+const run = async (spinner, config) => {
+  spinner.text = 'Building firestore rules... ';
+  const rulesTargetFilePath = path.join(process.cwd(), config.firestore.rulesTargetFile);
 
   // Setup rules file
   const rulesStart = `
@@ -20,15 +21,13 @@ service cloud.firestore {
   }
 }`;
 
-console.log('here');
-
   fs.writeFileSync(rulesTargetFilePath, rulesStart);
 
   // Read rules files
-  fs.readdirSync(path.join(process.cwd(), config.source, 'rules')).filter((fileName) => {
+  fs.readdirSync(path.join(process.cwd(), config.firestore.source, 'rules')).filter((fileName) => {
     return fileName.endsWith('.rules');
   }).forEach(async (fileName) => {
-    const rules = fs.readFileSync(path.join(process.cwd(), config.source, fileName));
+    const rules = fs.readFileSync(path.join(process.cwd(), config.firestore.source, 'rules', fileName));
     fs.appendFileSync(rulesTargetFilePath, `\n`);
     fs.appendFileSync(rulesTargetFilePath, rules)
     fs.appendFileSync(rulesTargetFilePath, `\n`);

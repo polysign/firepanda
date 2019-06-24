@@ -8,7 +8,7 @@
     "source": "."
   },
   "hosting": {
-    "public": "./dist",
+    "public": "./lib/web",
     "ignore": [
       "firebase.json",
       "**/.*",
