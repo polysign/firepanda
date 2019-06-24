@@ -43,7 +43,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
         indexesTargetFile: 'lib/collections/firestore.indexes.json'
       },
       storage: {
-        source: 'src/storage',
+        source: 'src/buckets',
         rulesTargetFile: 'lib/storage.rules'
       }
     };
