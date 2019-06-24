@@ -1,6 +1,6 @@
 {
   "name": "firepanda",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A Firestore ORM built using Typescript",
   "main": "lib/index.js",
   "scripts": {
@@ -19,21 +19,21 @@
     "firepanda": "./cli.js"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.12",
-    "firebase": "^6.0.2",
+    "@types/jest": "^24.0.15",
+    "firebase": "^6.2.2",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
-    "ts-node": "^8.1.0",
-    "tslint": "^5.16.0",
-    "typescript": "^3.4.5"
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.2"
   },
   "dependencies": {
-    "@firebase/testing": "^0.9.4",
-    "delay": "^4.2.0",
+    "@firebase/testing": "^0.11.2",
+    "delay": "^4.3.0",
     "enquirer": "^2.3.0",
     "execa": "^1.0.0",
-    "firebase-admin": "^7.3.0",
-    "firebase-functions": "^2.3.1",
+    "firebase-admin": "^8.2.0",
+    "firebase-functions": "^3.0.1",
     "fs-extra": "^8.0.1",
     "meow": "^5.0.0",
     "mkdirp": "^0.5.1",
