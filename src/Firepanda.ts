@@ -124,7 +124,7 @@ export function Firepanda(params: FirepandaParams) {
                 data[objectKey] = Object.assign({}, data[objectKey]);
                 break;
               case 'geopoint':
-                if (data[objectKey].constructor !== firebaseAdmin.firestore.GeoPoint) {
+                if (data[objectKey].constructor !== firebase.firestore.GeoPoint) {
                   let latitude = 0;
                   let longitude = 0;
                   if (data[objectKey].latitude || data[objectKey].lat) {

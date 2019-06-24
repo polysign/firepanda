@@ -65,6 +65,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
       path.join(projectSourcePath, 'functions', 'http'),
       path.join(projectSourcePath, 'functions', 'pubsub'),
       path.join(projectSourcePath, 'functions', 'firestore'),
+      path.join(projectSourcePath, 'functions', 'firestore', 'users'),
       path.join(projectSourcePath, 'functions', 'storage'),
       path.join(projectSourcePath, 'functions', 'config'),
       path.join(projectSourcePath, 'functions', 'services'),

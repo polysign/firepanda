@@ -3,12 +3,13 @@
 
 const meow = require('meow');
 const path = require('path');
-const fs = require('fs-extra');
 const ora = require('ora');
+const fs = require('fs-extra');
 
 const cli = meow(`
   Usage
     $ firepanda init <project-name> <path>
+    $ firepanda build
     $ firepanda -v
 `)
 
@@ -34,16 +35,12 @@ const runCli = async () => {
       if (cli.input[1] && cli.input[2]) {
         await require(`${basePath}/src/cli/init.js`)(spinner, basePath, cli.input[1], cli.input[2]);
       } else {
-        throw new Error('Project name and path are missing')
+        throw new Error('Project name and path are missing');
       }
       break;
     case 'build':
-      if (cli.input[1]) {
-          
-      } else {
-          
-      
-      }
+      const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json')));
+      await require(`${basePath}/src/cli/build.js`)(spinner, packageJson.firepanda);
       break;
   }
 
