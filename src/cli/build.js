@@ -52,6 +52,7 @@ const buildFirestoreIndexes = async (spinner, config) => {
 `;
 
   const indexesEnd = `
+  ]
 }`;
 
   fs.writeFileSync(indexesTargetFilePath, indexesStart);
