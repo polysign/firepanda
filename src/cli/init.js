@@ -32,13 +32,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
       'test': 'jest',
       'prebuild': 'tsc',
       'build': 'firepanda build',
-      'build:firestore': 'firepanda build firestore',
-      'build:functions': 'firepanda build functions',
-      'build:storage': 'firepanda build storage',
-      'deploy': 'firepanda deploy',
-      'deploy:firestore': 'firepanda deploy firestore',
-      'deploy:functions': 'firepanda deploy functions',
-      'deploy:storage': 'firepanda deploy storage',
+      'deploy': 'firebase deploy',
     };
 
     packageJson.firepanda = {
@@ -46,13 +40,6 @@ const createProject = async (spinner, basePath, projectConfig) => {
         source: 'src/collections',
         output: 'lib/collections',
         rulesTargetFile: 'lib/collections/firestore.rules'
-      },
-      functions: {
-        source: 'src/functions',
-        output: 'lib/functions',
-      },
-      storage: {
-        source: 'src/buckets'
       }
     };
 
@@ -71,6 +58,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
       path.join(projectSourcePath, 'functions', 'services'),
       path.join(projectSourcePath, 'buckets'),
       path.join(projectSourcePath, 'buckets', 'rules'),
+      path.join(projectSourcePath, 'web'),
     ].map(async (pathToCreate) => {
       return await mkdirp(pathToCreate);
     }));
@@ -117,7 +105,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
     spinner.text = 'Setup Firebase... ';
     const firebaseConfigSourcePath = path.join(basePath, 'src/cli/templates', 'firebase.template.json');
     const firebaseConfigTargetPath = path.join(projectBasePath, 'firebase.json');
-    fs.copyFileSync(firebaseConfigSourcePath, firebaseConfigTargetPath)
+    fs.copyFileSync(firebaseConfigSourcePath, firebaseConfigTargetPath);
 
     resolve();
   });
