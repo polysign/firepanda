@@ -80,6 +80,8 @@ const createProject = async (spinner, basePath, projectConfig) => {
     fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'pubsub.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'pubsub.ts')));
     fs.writeFileSync(path.join(projectSourcePath, 'functions/services', 'bigquery.ts'), fs.readFileSync(path.join(basePath, 'src/cli/templates/services', 'bigquery.ts')));
 
+    fs.copyFileSync(path.join(basePath, 'src/cli/templates/web.readme.md'), path.join(projectSourcePath, 'web/README.md'));
+
     fs.writeFileSync(path.join(projectBasePath, '.gitignore'), `
       /lib
       /node_modules
