@@ -22,7 +22,7 @@
     ]
   },
   "storage": {
-    "rules": "./lib/buckets/storage.rules"
+    "rules": "./lib/storage.rules"
   },
   "emulators": {
     "firestore": {
