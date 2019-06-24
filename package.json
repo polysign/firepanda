@@ -1,6 +1,6 @@
 {
   "name": "firepanda",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A Firestore ORM built using Typescript",
   "main": "lib/index.js",
   "scripts": {
