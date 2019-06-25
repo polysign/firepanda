@@ -5,7 +5,9 @@ import * as functions from 'firebase-functions';
 import * as FirebaseAdmin from 'firebase-admin';
 import * as Firebase from 'firebase'; 
 
-Firebase.initializeApp(functions.config().firebase);
+import { config } from './config';
+
+Firebase.initializeApp(config);
 
 const injectables = {
   firebase: Firebase,
