@@ -50,6 +50,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
 
     const projectSourcePath = path.join(projectBasePath, 'src');
     await Promise.all([
+      path.join(projectBasePath, 'config'),
       path.join(projectSourcePath, 'collections'),
       path.join(projectSourcePath, 'collections', 'rules'),
       path.join(projectSourcePath, 'collections', 'indexes'),
@@ -68,6 +69,8 @@ const createProject = async (spinner, basePath, projectConfig) => {
     ].map(async (pathToCreate) => {
       return await mkdirp(pathToCreate);
     }));
+
+    fs.copyFileSync(path.join(basePath, 'src/cli/templates', 'firebase.config.js'), path.join(projectBasePath, 'config', 'firebase.config.js'));
 
     fs.createFileSync(path.join(projectSourcePath, 'collections/rules', 'sample.rules'));
     fs.writeFileSync(path.join(projectSourcePath, 'collections/rules', 'sample.rules'), fs.readFileSync(path.join(basePath, 'src/cli/templates/firestore', 'rules.sample')));
@@ -100,7 +103,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
       'firepanda', 'jest', 'typescript', 'ts-jest', 'camelcase', 'glob',
       'firebase', 'firebase-admin', 'firebase-functions',
       '@google-cloud/pubsub', '@google-cloud/storage', '@google-cloud/bigquery',
-      '@google-cloud/scheduler', 
+      '@google-cloud/scheduler', 'copy'
     ];
     await execa('npm', ['install'].concat(dependencies), { cwd: projectBasePath });
 
