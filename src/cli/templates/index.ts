@@ -5,7 +5,7 @@ import * as functions from 'firebase-functions';
 import * as FirebaseAdmin from 'firebase-admin';
 import * as Firebase from 'firebase'; 
 
-import { config } from './config';
+import { config } from './config/firebase.conf';
 
 Firebase.initializeApp(config);
 

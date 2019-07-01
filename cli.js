@@ -44,7 +44,7 @@ const runCli = async () => {
       break;
   }
 
-  spinner.stopAndPersist({ text: 'Done', symbol: '-' });
+  spinner.stop();
 }
 
 const getBasePath = () => {

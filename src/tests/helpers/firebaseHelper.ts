@@ -13,5 +13,6 @@ export const setupFirebase = async (): Promise<firebase.app.App> => {
     projectId: projectId,
     rules: fs.readFileSync("./firebase/firestore.rules", "utf8")
   });
+  
   return app;
 }

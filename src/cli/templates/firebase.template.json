@@ -1,13 +1,15 @@
 {
   "firestore": {
+    "predeploy": "npm run build:firestore",
     "rules": "./lib/collections/firestore.rules",
     "indexes": "./lib/collections/firestore.indexes.json"
   },
   "functions": {
-    "predeploy": "npm run build",
+    "predeploy": "npm run build:functions",
     "source": "."
   },
   "hosting": {
+    "predeploy": "npm run build:hosting",
     "public": "./lib/web",
     "ignore": [
       "firebase.json",
@@ -22,6 +24,7 @@
     ]
   },
   "storage": {
+    "predeploy": "npm run build:storage",
     "rules": "./lib/storage.rules"
   },
   "emulators": {
