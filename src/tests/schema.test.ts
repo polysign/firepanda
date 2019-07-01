@@ -1,4 +1,5 @@
 import * as firebase from 'firebase';
+import * as firebaseAdmin from 'firebase-admin';
 import { setupFirebase } from './helpers/firebaseHelper';
 
 import { UsersCollection } from './collections/Users';
@@ -258,7 +259,7 @@ describe('Schema > Types', () => {
         // Given
         const data = {
           uid: 'user-id-2000',
-          createdAt: firebase.firestore.Timestamp.now()
+          createdAt: firebaseAdmin.firestore.Timestamp.now()
         };
 
         // When
@@ -300,7 +301,7 @@ describe('Schema > Types', () => {
         // Given
         const data = {
           uid: 'user-id-2000',
-          position: new firebase.firestore.GeoPoint(20, 39)
+          position: new firebaseAdmin.firestore.GeoPoint(20, 39)
         };
 
         // When
@@ -309,7 +310,6 @@ describe('Schema > Types', () => {
 
         // Then
         expect(typeof userDocument.position).toBe('object');
-        expect(userDocument.position.constructor).toBe(firebase.firestore.GeoPoint)
         expect(userDocument.position).toHaveProperty('longitude')
         expect(userDocument.position).toHaveProperty('latitude')
         expect(typeof userDocument.position.longitude).toBe('number');
@@ -330,7 +330,6 @@ describe('Schema > Types', () => {
         
         // Then
         expect(typeof userDocument.position).toBe('object');
-        expect(userDocument.position.constructor).toBe(firebase.firestore.GeoPoint)
         expect(userDocument.position).toHaveProperty('longitude')
         expect(userDocument.position).toHaveProperty('latitude')
         expect(typeof userDocument.position.longitude).toBe('number');

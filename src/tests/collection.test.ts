@@ -1,9 +1,10 @@
+import * as Firebase from 'firebase';
 import { setupFirebase } from './helpers/firebaseHelper';
 
 import { UsersCollection } from './collections/Users';
 import { WhereClause } from '../Query';
 
-let firebaseApp: firebase.app.App;
+let firebaseApp: Firebase.app.App;
 let Users: UsersCollection;
 
 beforeAll(async () => {

@@ -103,7 +103,7 @@ export function Firepanda(params: FirepandaParams) {
 
       async __cleanData(data: any): Promise<any> {
         Object.keys(data).forEach((objectKey) => {
-          if (objectKey !== '_id' && this.collectionSchema[objectKey]) { 
+          if (objectKey !== '_id' && this.collectionSchema[objectKey]) {
             switch(this.collectionSchema[objectKey].type) {
               case 'string':
                 data[objectKey] = data[objectKey].toString();
@@ -121,24 +121,41 @@ export function Firepanda(params: FirepandaParams) {
                 data[objectKey] = Object.assign({}, data[objectKey]);
                 break;
               case 'timestamp':
-                data[objectKey] = Object.assign({}, data[objectKey]);
+                let seconds = 0;
+                let nanoseconds = 0;
+
+                if (data[objectKey]._seconds) {
+                  seconds = data[objectKey]._seconds;
+                } else {
+                  seconds = data[objectKey].seconds;
+                }
+                
+                if (data[objectKey]._nanoseconds) {
+                  nanoseconds = data[objectKey]._nanoseconds;
+                } else {
+                  nanoseconds = data[objectKey].nanoseconds;
+                }
+
+                if (seconds && nanoseconds) {
+                  data[objectKey] = Object.assign({}, {seconds, nanoseconds});
+                } else {
+                  throw new Error('Unable to create timestamp')
+                }
                 break;
               case 'geopoint':
-                if (data[objectKey].constructor !== firebase.firestore.GeoPoint) {
-                  let latitude = 0;
-                  let longitude = 0;
-                  if (data[objectKey].latitude || data[objectKey].lat) {
-                    latitude = data[objectKey].latitude | data[objectKey].lat;
-                  }
-                  if (data[objectKey].longitude || data[objectKey].lng) {
-                    longitude = data[objectKey].longitude | data[objectKey].lng;
-                  }
+                let latitude = 0;
+                let longitude = 0;
+                if (data[objectKey].latitude || data[objectKey].lat || data[objectKey]._latitude) {
+                  latitude = data[objectKey].latitude | data[objectKey].lat | data[objectKey]._latitude;
+                }
+                if (data[objectKey].longitude || data[objectKey].lng || data[objectKey]._longitude) {
+                  longitude = data[objectKey].longitude | data[objectKey].lng | data[objectKey]._longitude;
+                }
 
-                  if (latitude && longitude) {
-                    data[objectKey] = new firebase.firestore.GeoPoint(latitude, longitude);
-                  } else {
-                    throw new Error('Unable to create geopoint')
-                  }
+                if (latitude && longitude) {
+                  data[objectKey] = Object.assign({}, {latitude, longitude});
+                } else {
+                  throw new Error('Unable to create geopoint')
                 }
                 break;
             }
@@ -155,7 +172,11 @@ export function Firepanda(params: FirepandaParams) {
       async __applyFieldTransform(fieldValue: any, schemaType: string): Promise<any> {
         switch(schemaType) {
           case 'timestamp':
-            return firebase.firestore.Timestamp.now();
+            const timestamp = Date.now();
+            return {
+              seconds: Math.round(timestamp / 1000),
+              nanoseconds: timestamp
+            };
         }
 
         return fieldValue;
@@ -283,7 +304,7 @@ export function Firepanda(params: FirepandaParams) {
           docRef = this.collectionRef.doc(docId);
           await docRef.set(await this.__cleanData(docData));
         } else {
-          docRef = await this.collectionRef.add(docData);
+          docRef = await this.collectionRef.add(await this.__cleanData(docData));
         }
 
         await this.__afterAddHook(docRef, docData);
