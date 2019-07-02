@@ -1,5 +1,6 @@
 import { ICollection } from "./types";
 import { Query, WhereClause } from "./Query";
+import * as firebase from 'firebase';
 
 export class Collection implements ICollection {
   firebase: firebase.app.App;
