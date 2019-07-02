@@ -13,7 +13,10 @@
     "test:firestore:emulator": "firebase emulators:start --only firestore",
     "ci": "start-server-and-test test:firestore:emulator http-get://127.0.0.1:8080 test:jest:ci"
   },
-  "author": "Georges Jentgen <georges@polysign.lu>",
+  "author": {
+    "name": "Georges Jentgen",
+    "email": "georges@polysign.lu"
+  },
   "license": "ISC",
   "bin": {
     "firepanda": "./cli.js"
