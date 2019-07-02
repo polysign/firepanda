@@ -7,7 +7,7 @@ import * as Firebase from 'firebase';
 
 import { config } from './config/firebase.conf';
 
-Firebase.initializeApp(config);
+FirebaseAdmin.initializeApp();
 
 const injectables = {
   firebase: Firebase,
@@ -20,7 +20,7 @@ collectionFiles.forEach((collectionFile: string) => {
   const collectionClass = require(path.join(__dirname, collectionFile));;
 
   Object.keys(collectionClass).forEach((collectionClassName) => {
-    injectables.collections[collectionClassName] = new collectionClass[collectionClassName](Firebase.app());
+    injectables.collections[collectionClassName] = new collectionClass[collectionClassName](FirebaseAdmin.app());
   });
 });
 
