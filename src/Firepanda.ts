@@ -13,14 +13,18 @@ interface FirepandaSchemaDefinition {
   transform?: TransformationFunction;
 }
 
+interface FirepandaSchemaEnumDefinition extends FirepandaSchemaDefinition {
+  values: string[];
+}
+
 interface FirepandaIdDefinition {
   from?: string;
 }
 
 interface FirepandaParams {
   name: string;
-  id: FirepandaIdDefinition;
-  schema: { [name: string]: FirepandaSchemaDefinition };
+  id?: FirepandaIdDefinition;
+  schema: { [name: string]: FirepandaSchemaDefinition | FirepandaSchemaEnumDefinition };
 }
 
 interface TransformationFunction {
@@ -56,6 +60,14 @@ export function Firepanda(params: FirepandaParams) {
         Object.keys(this.collectionSchema).forEach((key) => {
           if (this.collectionSchema[key].default && (!data[key] || [].concat(data[key]).length === 0)) {
             data[key] = this.collectionSchema[key].default;
+          }
+
+          switch(this.collectionSchema[key].type) {
+            case 'enum':
+              if (!data[key]) {
+                data[key] = this.collectionSchema[key].values[0];
+              }
+              break;
           }
         });
 
@@ -108,6 +120,10 @@ export function Firepanda(params: FirepandaParams) {
               case 'string':
                 data[objectKey] = data[objectKey].toString();
                 break;
+              case 'enum':
+                if (!Array.from(this.collectionSchema[objectKey].values).includes(data[objectKey].toString())) {
+                  data[objectKey] = this.collectionSchema[objectKey].values[0];
+                }
               case 'number':
                 data[objectKey] = Number(data[objectKey]);
                 break;
