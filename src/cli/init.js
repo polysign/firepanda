@@ -24,7 +24,7 @@ const run = async (spinner, basePath, projectName, projectPath) => {
   console.log(['#>', chalk.blue('firebase use --add')].join(' '));
   console.log();
   console.log(chalk.green('3. Add Firebase configuration in'));
-  console.log(['#>', chalk.blue('src/config/firebase.conf.ts')].join(' '));
+  console.log(['#>', chalk.blue('config/environment.json')].join(' '));
   console.log();
 }
 
@@ -54,6 +54,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
       'build:functions': 'npm-run-all -s build:typescript',
       'build:storage': 'npm-run-all -s build:typescript build:firepanda',
       'build': 'npm-run-all -s build:typescript build:firepanda build:hosting',
+      'deploy:config': 'firepanda config',
       'deploy:functions': 'firebase deploy --only functions',
       'deploy:storage': 'firebase deploy --only storage',
       'deploy:hosting': 'firebase deploy --only hosting',
@@ -75,7 +76,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
 
     const projectSourcePath = path.join(projectBasePath, 'src');
     await Promise.all([
-      path.join(projectSourcePath, 'config'),
+      path.join(projectBasePath, 'config'),
       path.join(projectSourcePath, 'collections'),
       path.join(projectSourcePath, 'collections', 'rules'),
       path.join(projectSourcePath, 'collections', 'indexes'),
@@ -94,7 +95,7 @@ const createProject = async (spinner, basePath, projectConfig) => {
       return await mkdirp(pathToCreate);
     }));
 
-    fs.copyFileSync(path.join(basePath, 'src/cli/templates/config', 'firebase.conf.ts'), path.join(projectSourcePath, 'config', 'firebase.conf.ts'));
+    fs.copyFileSync(path.join(basePath, 'src/cli/templates/config', 'environment.json'), path.join(projectBasePath, 'config', 'environment.json'));
 
     fs.createFileSync(path.join(projectSourcePath, 'collections/rules', 'sample.rules'));
     fs.copyFileSync(path.join(basePath, 'src/cli/templates/firestore', 'rules.sample'), path.join(projectSourcePath, 'collections/rules', 'sample.rules'));
