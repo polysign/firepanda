@@ -10,6 +10,7 @@ const cli = meow(`
   Usage
     $ firepanda init <project-name> <path>
     $ firepanda build
+    $ firepanda config
     $ firepanda -v
 `)
 
@@ -41,6 +42,13 @@ const runCli = async () => {
     case 'build':
       const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json')));
       await require(`${basePath}/src/cli/build.js`)(spinner, packageJson.firepanda);
+      break;
+    case 'config':
+      if (cli.input[1]) {
+        await require(`${basePath}/src/cli/config.js`)(spinner, cli.input[1]);
+      } else {
+        throw new Error('Environment name is missing');
+      }
       break;
   }
 
